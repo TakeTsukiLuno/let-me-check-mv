@@ -24,16 +24,14 @@
 - 镜头与画面程序保持 v3.13 定稿逻辑，仅删除嵌入音乐并设置静音默认。
 - 早期母带处理报告仅为**文本制作记录**，不附带音频数据；成片验收记录同理。
 
-## 如何归档
+## 当前归档状态与维护
 
-1. 先解压②原始美术资料。
-2. 再解压**①新版无音频工程**并覆盖②中同名的根目录 README、SHA、Git 配置。
-3. 复制⑦ 98镜头总览至 `release/LET_ME_CHECK_98镜头审片总览.jpg`。
-4. 在目录 `LET_ME_CHECK_v3.13_FINAL/` 执行 `python tools/verify_archive.py`，确认 PASS。
-5. **先 clone 本仓库**，将合并后的文件复制到克隆目录，用 Git 提交新增/更新文件；勿强制推送覆盖既有版本史。
-6. 提交前检查 `git diff --cached --name-only`，确保不存在任何 WAV/MP3/FLAC/AAC/MP4/MKV 等媒体或旧的内嵌音轨 HTML。
-
-参见 `history/VERSION_HISTORY.md` 及 `UPLOAD_STATUS.md`。相关音乐素材由导演私人留存，不纳入公开 GitHub 仓库。
+- **公开归档已完成**：v3.13 无音频工程、原始角色美术、98 镜头总览及修改记录都在 `main`；首次归档提交 `ad7dc4885c9c84a436568de047d454b5e101c382`，上传后的最终校验提交为 `e1842c7ae489f25addeee5e74d5a27e0ed74a4af`。
+- 已通过 GitHub 独立克隆执行 `python tools/verify_archive.py`，结果 `PASS 0 bad files`；公开仓库不含歌曲音频或成片视频。详见 [上传验收记录](UPLOAD_STATUS.md)。
+- **此仓库不是待上传工程**。旧版“解压②→覆盖①→复制⑦→git push”的操作已完成，今后不应自动重复。
+- 新的 AI/Codex 协作维护请先阅读 [AGENTS.md](AGENTS.md)：定稿资产默认只读、严禁擅自添加媒体、保留署名与历史、校验后才报告完成。
+- 未来如获导演授权修改代码或素材，建议另开版本或分支；更新 SHA256 清单并完成本地与远端验证，不得 `git push --force`。
+- `source/LET_ME_CHECK_v3.13_交互工程_无内嵌音频.html` 可静音预览或选取**用户本地**音频；仓库不提供音频文件。
 
 ## 共创与授权
 
