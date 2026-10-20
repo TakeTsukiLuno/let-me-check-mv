@@ -1,0 +1,21 @@
+# Public v3.13 archive: no audio or video files
+__pycache__/
+.DS_Store
+Thumbs.db
+node_modules/
+*.tmp
+*.log
+
+# Music and video must remain outside this public repository
+*.wav
+*.mp3
+*.flac
+*.aac
+*.m4a
+*.ogg
+*.opus
+*.mp4
+*.mkv
+*.mov
+*.webm
+assets/audio/
