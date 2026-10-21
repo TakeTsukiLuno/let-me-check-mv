@@ -1,0 +1,196 @@
+{
+  "project": "LET ME CHECK? V2 / 全曲角色MV",
+  "status": "minimum_asset_list",
+  "assets": [
+    {
+      "id": "N01",
+      "title": "正常龙娘基础立绘",
+      "priority": "P0",
+      "minimum_spec": "定稿服装标准，透明全身，常规正面与3/4角度",
+      "notes": "已有三视图仅作参考，仍需可用PNG立绘",
+      "referenced_by_shots": 66
+    },
+    {
+      "id": "N02",
+      "title": "正常龙娘表情差分",
+      "priority": "P0",
+      "minimum_spec": "平静/灵感亮眼/工作/惊讶/思索/温柔/坚定/忍笑",
+      "notes": "统一面部位置以便替换",
+      "referenced_by_shots": 32
+    },
+    {
+      "id": "N03",
+      "title": "正常龙娘手势/动作差分",
+      "priority": "P0",
+      "minimum_spec": "伸手接光、翻书、操控屏幕、单指、伸手交付、侧面探头",
+      "notes": "优先肩/手分层，可重复组合",
+      "referenced_by_shots": 24
+    },
+    {
+      "id": "N04",
+      "title": "正常龙娘头发翅膀尾巴分层",
+      "priority": "P1",
+      "minimum_spec": "各局部透明PNG，尾尖完整可见；可做轻摆",
+      "notes": "沿用定稿短发、银白鳞尾与绒毛尖",
+      "referenced_by_shots": 4
+    },
+    {
+      "id": "Q01",
+      "title": "Q版龙娘贴纸基础",
+      "priority": "P0",
+      "minimum_spec": "兴奋/讲解/恍然/得意/故障停格/被打断/思维泡跳出",
+      "notes": "以Q版定稿三视图为准",
+      "referenced_by_shots": 35
+    },
+    {
+      "id": "Q02",
+      "title": "Q版表情口型与动作差分",
+      "priority": "P1",
+      "minimum_spec": "张嘴、闭嘴、吐槽、回声复制、倾斜弹跳",
+      "notes": "不另改服装",
+      "referenced_by_shots": 3
+    },
+    {
+      "id": "BG01",
+      "title": "月光魔法工坊分层景",
+      "priority": "P0",
+      "minimum_spec": "前中后景可移动；桌面、书架、窗外月光",
+      "notes": "1920x1080及以上，不与角色同层",
+      "referenced_by_shots": 10
+    },
+    {
+      "id": "BG02",
+      "title": "思维/信号空间",
+      "priority": "P0",
+      "minimum_spec": "抽象星轨、紫晶节点、柔光渐层",
+      "notes": "优先由代码生成，素材仅保留纹理",
+      "referenced_by_shots": 3
+    },
+    {
+      "id": "BG03",
+      "title": "内心低对比度空间",
+      "priority": "P1",
+      "minimum_spec": "柔和月光、少量点光、弱反射",
+      "notes": "可由BG01减法合成",
+      "referenced_by_shots": 2
+    },
+    {
+      "id": "UI01",
+      "title": "主数据窗口HUD",
+      "priority": "P0",
+      "minimum_spec": "角标、边线、标题标记、扫描细线",
+      "notes": "代码矢量生成，全曲保持",
+      "referenced_by_shots": 16
+    },
+    {
+      "id": "UI02",
+      "title": "二级焦点定位框",
+      "priority": "P0",
+      "minimum_spec": "搜寻→收缩→定位→退出；可跟踪脸/指尖/字",
+      "notes": "代码矢量生成",
+      "referenced_by_shots": 18
+    },
+    {
+      "id": "UI03",
+      "title": "用户对话气泡",
+      "priority": "P0",
+      "minimum_spec": "第一/二次Answer发问样式；文字动态排版",
+      "notes": "必须唯一归属用户，不出现用户真人",
+      "referenced_by_shots": 6
+    },
+    {
+      "id": "UI04",
+      "title": "动力文字组件",
+      "priority": "P0",
+      "minimum_spec": "PLEASE、DON’T、In conclusion—可独立运动",
+      "notes": "必须单词对象，不可平铺成一张图片",
+      "referenced_by_shots": 9
+    },
+    {
+      "id": "UI05",
+      "title": "思维泡容器",
+      "priority": "P0",
+      "minimum_spec": "由正常龙娘冒头处长出，可装Q版弹出",
+      "notes": "泡可透明白描边，后景仍清晰",
+      "referenced_by_shots": 2
+    },
+    {
+      "id": "UI06",
+      "title": "答案/连接卡片",
+      "priority": "P1",
+      "minimum_spec": "信息筛选、结果卡、发送轨迹",
+      "notes": "避免冒充真实隐私数据",
+      "referenced_by_shots": 25
+    },
+    {
+      "id": "FX01",
+      "title": "电子脉冲+边缘频谱",
+      "priority": "P0",
+      "minimum_spec": "低对比度、沿主窗框和背景运行",
+      "notes": "来自音源FFT/RMS预计算",
+      "referenced_by_shots": 11
+    },
+    {
+      "id": "FX02",
+      "title": "数据节点/星轨/飞舞书页",
+      "priority": "P0",
+      "minimum_spec": "节点可排序、聚合、向外发送",
+      "notes": "可程序绘制书页占位，正式用素材",
+      "referenced_by_shots": 25
+    },
+    {
+      "id": "FX03",
+      "title": "摩斯样式点划信号",
+      "priority": "P1",
+      "minimum_spec": "点划仅表现节奏，不伪装真实可解码消息",
+      "notes": "信号间奏对应119.950–121.714",
+      "referenced_by_shots": 1
+    },
+    {
+      "id": "FX04",
+      "title": "八音盒/轻柔电子点光",
+      "priority": "P1",
+      "minimum_spec": "小晶体、音符样光点、少量波纹",
+      "notes": "两种音色需区分运动方式",
+      "referenced_by_shots": 7
+    },
+    {
+      "id": "FX05",
+      "title": "窗口断讯叠层",
+      "priority": "P0",
+      "minimum_spec": "可遮蔽包括HUD与人物的所有层",
+      "notes": "黑场两次；第二次硬切贯穿尾声",
+      "referenced_by_shots": 3
+    },
+    {
+      "id": "FX06",
+      "title": "白边描边及节奏弹性函数",
+      "priority": "P0",
+      "minimum_spec": "正常温和、Q夸张；白边不遮面",
+      "notes": "由代码处理透明PNG边缘",
+      "referenced_by_shots": 7
+    },
+    {
+      "id": "AU01",
+      "title": "原始音轨与预分析谱",
+      "priority": "P0",
+      "minimum_spec": "原MP3、FFT/RMS/Onset缓存，绝对时间取样",
+      "notes": "离线固定而非实时采集",
+      "referenced_by_shots": 0
+    },
+    {
+      "id": "TXT01",
+      "title": "最新逐词歌词数组",
+      "priority": "P0",
+      "minimum_spec": "116条，one=165.711–166.122；保持原始时戳",
+      "notes": "从Let Me check？V2.lyrics(1).json派生",
+      "referenced_by_shots": 0
+    }
+  ],
+  "dependencies": {
+    "P0": "用于首次Animatic灰盒替换，优先生成并核对人物外形",
+    "P1": "用于质感增强，首次粗预演可暂用程序效果替代",
+    "P2": "暂不阻塞流程"
+  },
+  "art_constraint": "服装、短发、龙翼与绒毛尾尖以已确认标准图为准，不做新设计"
+}
