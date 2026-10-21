@@ -1,0 +1,109 @@
+{
+  "title": "LET ME CHECK? V2 — 音乐与情绪宏观结构初稿",
+  "version": "0.1",
+  "scope": "完整曲，不含具体镜头顺序；角色为画面焦点，频谱仅为装饰性辅助",
+  "sources": {
+    "audio": "LET ME CHECK ？ v2(1).mp3",
+    "lyrics": "Let Me check？V2.lyrics.json",
+    "observed_audio_duration_s": 274.814
+  },
+  "method": [
+    "RMS 能量包络",
+    "起音强度/节奏活跃度",
+    "频谱重心/平坦度",
+    "MFCC+chroma 等特征变化点",
+    "歌句时间和歌词语义"
+  ],
+  "global_beat_estimate_bpm": 143.55,
+  "caveat": "音乐情绪为推断；边界为粗分镜分析锚点，误差可达数秒。未将过去对唱法的主观描述作为证据。",
+  "sections": [
+    {
+      "id": "A",
+      "start": 0,
+      "end": 40,
+      "title": "建立角色与驱动",
+      "audio_observation": "从较轻的开场逐步加入力度；16–20 秒附近有明显变化，20–27 秒有无歌词的音乐空间。",
+      "energy_db_mean": -27.3,
+      "spectral_centroid_hz_mean": 1810,
+      "lyrical_emotion_hypothesis": "好奇、主动、逐渐进入兴奋状态",
+      "subsections_note": "A01 0–20 相对轻；A02 20–40 连续加速感与段落建立"
+    },
+    {
+      "id": "B",
+      "start": 40,
+      "end": 74,
+      "title": "第一轮高能展开",
+      "audio_observation": "约 44–48 秒出现结构变化，48 秒以后平均能量抬高并维持。",
+      "energy_db_mean": -23.0,
+      "spectral_centroid_hz_mean": 1855,
+      "lyrical_emotion_hypothesis": "外放、自信、持续推进",
+      "subsections_note": "B01 40–48 短促强调；B02 48–74 重复句式形成稳定强段"
+    },
+    {
+      "id": "C",
+      "start": 74,
+      "end": 120,
+      "title": "紧凑互动与再扩张",
+      "audio_observation": "74 秒附近换段；90–96 秒总体能量短暂回落、起音仍密集；96 秒后再次增强；118 秒附近有显著音色变化。",
+      "energy_db_mean": -23.4,
+      "spectral_centroid_hz_mean": 1821,
+      "lyrical_emotion_hypothesis": "忙碌、俏皮、略显紧绷，到末端更夸张",
+      "subsections_note": "C01 74–90 推进；C02 90–96 短句对话；C03 96–120 再次展开"
+    },
+    {
+      "id": "D",
+      "start": 120,
+      "end": 168,
+      "title": "中段大幅反差与重组",
+      "audio_observation": "120–145 秒频谱重心和整体能量都下降；145 秒前后出现明显转折并回升；160–168 秒再次降低力度。",
+      "energy_db_mean": -27.2,
+      "spectral_centroid_hz_mean": 1425,
+      "lyrical_emotion_hypothesis": "由外放转为审视，重新找到动力后又留下问题",
+      "subsections_note": "D01 120–130 转折；D02 130–145 低能量；D03 145–160 回升；D04 160–168 悬置"
+    },
+    {
+      "id": "E",
+      "start": 168,
+      "end": 190,
+      "title": "高能主题重新确立",
+      "audio_observation": "约 166–169 秒进入强变化，168–190 秒是全曲平均能量最高的连续区段之一。",
+      "energy_db_mean": -21.0,
+      "spectral_centroid_hz_mean": 1720,
+      "lyrical_emotion_hypothesis": "从思索转为明亮、笃定、有推动力",
+      "subsections_note": "E01 168–180 重新点亮；E02 180–190 延续并强化"
+    },
+    {
+      "id": "F",
+      "start": 190,
+      "end": 230,
+      "title": "持续推进与第二次减法",
+      "audio_observation": "190–207 秒保持中高能量；206–214 秒出现明显音色/动态拐点，207–221 秒总体能量明显降低；221 秒后重新提升。",
+      "energy_db_mean": -24.0,
+      "spectral_centroid_hz_mean": 1626,
+      "lyrical_emotion_hypothesis": "维持前进，但中间短暂显露脆弱或迟疑，再积聚力量",
+      "subsections_note": "F01 190–207 推进；F02 207–221 收缩；F03 221–230 重新组织"
+    },
+    {
+      "id": "G",
+      "start": 230,
+      "end": 262,
+      "title": "终盘高能回环",
+      "audio_observation": "230 秒后保持强能量，240–260 秒达到全曲较高平均电平，段落重复性与持续性明显。",
+      "energy_db_mean": -21.5,
+      "spectral_centroid_hz_mean": 1668,
+      "lyrical_emotion_hypothesis": "强化、肯定、最终展开",
+      "subsections_note": "G01 230–245 强势回返；G02 245–262 终盘延续"
+    },
+    {
+      "id": "H",
+      "start": 262,
+      "end": 274.814,
+      "title": "尾声与消隐",
+      "audio_observation": "约 262 秒起出现最显著的动态衰减之一，270 秒以后接近全曲最轻的状态。",
+      "energy_db_mean": -30.2,
+      "spectral_centroid_hz_mean": 1407,
+      "lyrical_emotion_hypothesis": "释放之后的尾韵，留下轻微反差",
+      "subsections_note": "H01 262–270 尾声；H02 270–274.8 消隐"
+    }
+  ]
+}
