@@ -29,15 +29,13 @@
 | `release/` | 已公开的审片总览与公开预览资源（不含音乐） |
 | `history/` | v0.1–v3.14.2 制作沿革、原始日志、独立修改记录与审查记录 |
 | `tools/` | 归档校验与维护工具 |
-| `LET_ME_CHECK_V2_v3.14.2_DeepSeek联合修改版/` | v3.14.2 执行包辅助文件 |
+| `LET_ME_CHECK_V2_v3.14.2_DeepSeek联合修改版/` | v3.14.2 本机 FFmpeg 执行包文件 |
 
 ### v3.14.2 本机 FFmpeg 执行包
 
 目录：[`LET_ME_CHECK_V2_v3.14.2_DeepSeek联合修改版/`](LET_ME_CHECK_V2_v3.14.2_DeepSeek联合修改版/)
 
-该目录当前包含 `使用说明.md`、`LET_ME_CHECK_V2_v3.14.2_render_local_ffmpeg.py` 和 `启动本地导出.bat`。
-
-**重要：`index.html` 本次按维护决定跳过上传，因此该 GitHub 目录不是完整可运行的执行包。** 完整的自包含 HTML 与上述辅助文件仍在本地执行包 ZIP 中。若要使用本机 FFmpeg 导出，需要完整包中的 `index.html` 与配套程序共同存在于同一目录；`.bat` 启动器只随执行包分发，不单独放在仓库根目录。
+该目录包含 `index.html`、`使用说明.md`、`LET_ME_CHECK_V2_v3.14.2_render_local_ffmpeg.py` 和 `启动本地导出.bat`，可作为完整的本机 FFmpeg 执行目录使用。`index.html` 已按 GitHub 单文件限制优化至 24,769,457 字节，图像细节有轻微有损重编码，具体处理与验证边界见独立修改记录。`.bat` 启动器只随执行包分发，不单独放在仓库根目录。
 
 启动器会启动本地服务并打开页面；请保持命令窗口运行。加载本地音源后，使用“逐帧渲染并导出 MP4”。
 
