@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LET ME CHECK｜VIBE v0.13.3 思维简报与CHECK代码终合成版</title>
+<style>
+:root{--ink:#f7f1ff;--muted:#d1c6ec;--violet:#bca4ff;--gold:#ffd990;--line:rgba(224,207,255,.22);--panel:rgba(11,12,29,.82);--accent:#97e7ff;--pulse:0;--flash:0;}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#080914;color:var(--ink);font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}body{display:grid;place-items:center;overflow:hidden}button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:rgba(18,18,43,.8);border-radius:999px;padding:8px 12px}button:hover{background:rgba(55,45,95,.9)}button.active{border-color:rgba(255,217,144,.8);box-shadow:inset 0 0 18px rgba(184,145,255,.16);color:#fff4d7}
+#app{position:relative;width:min(100vw,177.7778vh);height:min(100vh,56.25vw);aspect-ratio:16/9;overflow:hidden;background:#0b0c1b;border:1px solid rgba(255,255,255,.07);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+#backdrop{position:absolute;inset:-2%;background:#11122a center/cover no-repeat;transition:background-image .3s ease, transform .2s ease;z-index:0;transform:scale(calc(1 + var(--pulse)*0.008))}#shade{position:absolute;inset:0;z-index:1;background:radial-gradient(circle at 50% 40%,transparent 28%,rgba(4,4,13,.28) 72%,rgba(4,4,13,.65)),linear-gradient(180deg,rgba(4,5,16,.45),transparent 24%,transparent 75%,rgba(4,5,16,.6));pointer-events:none}#flash{position:absolute;inset:0;z-index:29;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.12),rgba(255,255,255,0) 48%),linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0));opacity:var(--flash);mix-blend-mode:screen;transition:opacity .18s ease}
+header{position:absolute;left:2%;right:2%;top:2%;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:30}.brand{display:flex;align-items:center;gap:10px;letter-spacing:.15em;font-size:clamp(11px,.9vw,16px);white-space:nowrap}.gem{width:10px;height:10px;border:1px solid var(--gold);transform:rotate(45deg);box-shadow:0 0 12px #9d82ff}.headright{display:flex;align-items:center;gap:10px}.chip{font:11px ui-monospace,monospace;color:#d7caff;border:1px solid rgba(219,203,255,.18);background:rgba(8,8,23,.48);padding:7px 10px;border-radius:999px;white-space:nowrap}
+#sceneInfo{position:absolute;left:2.4%;top:9%;z-index:20;max-width:42%;padding:11px 15px;border-radius:14px;background:rgba(8,9,24,.48);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(10px)}#sceneKicker{font:10px ui-monospace,monospace;color:var(--gold);letter-spacing:.17em;text-transform:uppercase}#sceneTitle{font-size:clamp(16px,1.45vw,25px);font-weight:750;margin-top:4px}#sceneDesc{font-size:clamp(10px,.8vw,13px);color:var(--muted);margin-top:4px;line-height:1.45}
+#visual{position:absolute;inset:0;z-index:5;overflow:hidden}
+.hero{position:absolute;opacity:0;transition:opacity .24s ease;pointer-events:none}
+.hero.show{opacity:1}
+.hero.fullcg{z-index:0;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;filter:none;transform:translate3d(calc(-50% + var(--camX,0%)),calc(-50% + var(--camY,0%)),0) scale(var(--camScale,1));transform-origin:center center;left:50%;top:50%;will-change:transform;transition:none!important}
+.hero.sprite{z-index:6;left:50%;top:50%;width:auto;height:70%;max-width:70%;max-height:80%;object-fit:contain;transform:translate3d(-50%,-46%,0);filter:drop-shadow(0 0 2px rgba(255,255,255,.85)) drop-shadow(0 0 18px rgba(151,231,255,.45)) drop-shadow(0 18px 28px rgba(0,0,0,.5));will-change:transform,filter}
+.hero.fullbody{z-index:6;left:64%;top:50%;width:auto;height:86%;max-width:64%;max-height:94%;object-fit:contain;object-position:center;transform:translate3d(-50%,-50%,0);transform-origin:50% 88%;filter:drop-shadow(0 0 2px rgba(255,255,255,.7)) drop-shadow(0 0 14px rgba(151,231,255,.28)) drop-shadow(0 16px 24px rgba(0,0,0,.46));will-change:transform,filter}
+.hero.character-switch{animation:characterSwitch .32s ease-out both}
+@keyframes characterSwitch{0%{filter:drop-shadow(0 0 2px rgba(255,255,255,.7)) drop-shadow(0 0 14px rgba(151,231,255,.28)) drop-shadow(0 16px 24px rgba(0,0,0,.46));opacity:1}45%{filter:drop-shadow(0 0 18px rgba(255,217,144,.92)) drop-shadow(0 0 26px rgba(151,231,255,.72)) drop-shadow(0 16px 24px rgba(0,0,0,.46));opacity:1}100%{filter:drop-shadow(0 0 2px rgba(255,255,255,.7)) drop-shadow(0 0 14px rgba(151,231,255,.28)) drop-shadow(0 16px 24px rgba(0,0,0,.46));opacity:1}}
+#visual.comic-mode #hero1.show{left:7%;top:54%;height:80%;max-width:60%;max-height:88%;transform:translate3d(0,-50%,0);z-index:6}
+#visual.comic-mode .hero.sprite.show{left:auto!important;right:2.5%!important;top:auto!important;bottom:1.5%!important;width:auto!important;height:31%!important;max-width:29%!important;max-height:35%!important;transform:translate3d(0,0,0)!important;transform-origin:bottom center;z-index:8!important}
+#visual.ending-peek #hero17.show{left:auto;right:-4%;top:auto;bottom:-9%;height:48%;max-width:42%;transform:translate3d(0,0,0) rotate(-7deg);z-index:8}
+
+#chapterPill{position:absolute;right:2.4%;top:9.5%;z-index:21;padding:8px 12px;border-radius:999px;background:rgba(9,10,26,.6);border:1px solid var(--line);font:11px ui-monospace,monospace;color:#e6d9ff}
+.pageFloat{position:absolute;width:12%;max-width:170px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.3));opacity:.88;transition:transform .18s linear, opacity .25s ease}
+/* reusable strips and stamps */
+#rhythmOverlay{position:absolute;inset:0;pointer-events:none;z-index:8}.sweep{position:absolute;height:9%;width:120%;left:-10%;background:linear-gradient(90deg,transparent,rgba(196,165,255,.05),rgba(255,216,144,.11),rgba(196,165,255,.05),transparent);mix-blend-mode:screen;transform:translateX(-100%) skewX(-18deg);opacity:0}#sweepA{top:20%}#sweepB{top:58%}.stripCol{position:absolute;top:0;bottom:0;width:3.6%;background:linear-gradient(180deg,transparent,rgba(147,231,255,.08),transparent);opacity:.12;filter:blur(2px)}#colL{left:6%}#colR{right:6%}
+#stamp{position:absolute;right:7%;bottom:22%;z-index:19;padding:10px 16px;border-radius:14px;border:1px solid rgba(255,217,144,.34);background:rgba(14,11,31,.68);backdrop-filter:blur(8px);font:700 clamp(11px,.95vw,16px)/1 Inter,sans-serif;letter-spacing:.12em;color:#fff0c9;text-transform:uppercase;opacity:0;transform:translateY(8px) scale(.96);box-shadow:0 12px 28px rgba(0,0,0,.18), inset 0 0 22px rgba(255,226,164,.08)}
+/* work scene */
+#workScene{position:absolute;inset:0;display:none;z-index:7}#workScene.on{display:block}.codeWindow{position:absolute;left:4%;top:18.5%;width:59%;height:61.5%;border:1px solid rgba(205,184,255,.46);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,rgba(12,14,36,.95),rgba(18,15,43,.86));box-shadow:0 0 0 5px rgba(167,139,255,.04),0 0 calc(38px + var(--pulse)*18px) rgba(106,88,200,.18),inset 0 0 40px rgba(146,121,255,.05);transition:box-shadow .08s linear}.codeWindow:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 28px,rgba(168,160,224,.06) 29px),linear-gradient(180deg,rgba(255,255,255,.025),transparent 18%);pointer-events:none}.codeWindow:after{content:"";position:absolute;inset:-1px;border-radius:16px;box-shadow:inset 0 0 calc(12px + var(--pulse)*10px) rgba(255,226,164,.14)}.scanline{position:absolute;left:0;right:0;height:16%;background:linear-gradient(180deg,transparent,rgba(150,236,255,.12),rgba(255,216,144,.06),transparent);mix-blend-mode:screen;top:18%;filter:blur(4px);opacity:.8;pointer-events:none}.winhead{position:absolute;top:0;left:0;right:0;height:12%;display:flex;align-items:center;justify-content:space-between;padding:0 3%;border-bottom:1px solid var(--line);background:rgba(105,85,168,.12);font-size:clamp(9px,.78vw,14px);letter-spacing:.1em}.state{font:clamp(8px,.65vw,11px) ui-monospace,monospace;color:#a8f0d1}.codebody{position:absolute;left:0;right:0;top:12%;bottom:15%;padding:2.6% 4%;font:clamp(8px,.82vw,13px)/1.58 ui-monospace,Consolas,monospace;overflow:hidden}.cline{opacity:0;transform:translateY(4px);transition:opacity .14s,transform .14s,background .12s, color .12s;white-space:nowrap;padding:1px 5px;border-radius:8px}#workScene.rolling-code .cline{opacity:1;transform:translateY(0);transition:none}#workScene.rolling-code .cline.pending-line{opacity:.24;transform:translateY(3px)}#workScene.rolling-code .codebody{scroll-behavior:auto}.cline.on{opacity:1;transform:translateY(0)}.cline.hot{background:rgba(151,231,255,.12);box-shadow:inset 0 0 0 1px rgba(151,231,255,.16)}.cline.verified{opacity:1;color:#ffe7a2;background:rgba(255,217,144,.09);box-shadow:inset 0 0 0 1px rgba(255,217,144,.16)}.ln{display:inline-block;width:2em;text-align:right;margin-right:1.1em;color:#777da8}.kw{color:#d6baff}.fn{color:#8ddcff}.str{color:#ffdb9c}.ok{color:#91efca}.cm{color:#8187b4}.v{color:#eee9ff}.cursor{display:inline-block;width:.7ch;height:1.1em;background:rgba(255,231,174,.85);vertical-align:-.1em;margin-left:.18em;animation:blink 1s step-end infinite}@keyframes blink{50%{opacity:0}}
+.winfoot{position:absolute;bottom:0;left:0;right:0;height:15%;display:flex;align-items:center;gap:12px;padding:0 3%;border-top:1px solid var(--line);font:10px ui-monospace,monospace;color:#cfc6ef}.track{flex:1;height:5px;background:rgba(185,162,255,.18);border-radius:9px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,#9586ff,#8fd8ff,#ffe49d)}.miniEq{display:flex;align-items:flex-end;gap:3px;height:18px}.miniEq i{display:block;width:3px;background:linear-gradient(180deg,#ffe39d,#91deff);border-radius:3px;animation:eq 0.95s ease-in-out infinite alternate}.miniEq i:nth-child(2){animation-delay:.12s}.miniEq i:nth-child(3){animation-delay:.22s}.miniEq i:nth-child(4){animation-delay:.08s}.miniEq i:nth-child(5){animation-delay:.3s}@keyframes eq{from{height:4px}to{height:17px}}
+.qzone{position:absolute;right:3.2%;top:15.6%;width:31%;height:68%;display:grid;place-items:center}.qglow{position:absolute;bottom:4%;width:80%;height:25%;border-radius:50%;background:radial-gradient(ellipse,rgba(141,113,255,.3),transparent 68%);filter:blur(12px)}#qmascot{position:absolute;bottom:6%;height:91%;max-width:100%;object-fit:contain;filter:drop-shadow(0 16px 22px rgba(0,0,0,.46));transform-origin:50% 85%}.qtag{position:absolute;top:10%;right:4%;padding:8px 12px;border:1px solid rgba(221,205,255,.22);background:rgba(10,10,27,.65);border-radius:999px;font-size:clamp(9px,.7vw,12px);letter-spacing:.08em;transition:transform .18s ease,opacity .18s ease}.qtag.second{top:25%;right:0%}.taskStamp{position:absolute;left:4.5%;top:15.4%;padding:7px 11px;border-radius:999px;background:rgba(10,10,27,.7);border:1px solid rgba(221,205,255,.18);font:10px ui-monospace,monospace;color:#d9d3f1;letter-spacing:.12em}
+/* dialogue / cards */
+.dialogue{position:absolute;left:10%;right:10%;top:25%;display:flex;flex-direction:column;gap:16px;align-items:center}.bubble{max-width:68%;padding:14px 20px;border-radius:18px;background:rgba(11,12,30,.75);border:1px solid rgba(221,205,255,.2);box-shadow:0 12px 28px rgba(0,0,0,.2);font-size:clamp(16px,1.5vw,27px);font-weight:700;text-align:center;backdrop-filter:blur(10px);transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease}.bubble.pop{transform:scale(1.04);box-shadow:0 14px 34px rgba(0,0,0,.24);border-color:rgba(255,217,144,.38)}.bubble.alt{align-self:flex-end;border-color:rgba(255,217,144,.28);color:#ffe6b3}.bubble.left{align-self:flex-start}.contextWord{position:absolute;left:50%;top:17%;transform:translateX(-50%);font-size:clamp(25px,3.2vw,54px);font-weight:850;letter-spacing:.16em;color:rgba(255,230,173,.9);text-shadow:0 0 30px rgba(198,166,255,.3);animation:throb 1s ease-in-out infinite alternate}@keyframes throb{from{transform:translateX(-50%) scale(.995)}to{transform:translateX(-50%) scale(1.015)}}
+#answerCard{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48%;padding:22px;border-radius:18px;background:rgba(9,10,25,.82);border:1px solid rgba(221,205,255,.25);text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+/* concert */
+#stageGlow{position:absolute;inset:0;pointer-events:none;display:none;background:radial-gradient(ellipse at 50% 48%,rgba(235,218,255,.2),transparent 40%),linear-gradient(180deg,rgba(88,56,158,.05),rgba(7,6,20,.18));mix-blend-mode:screen}#stageGlow.on{display:block;z-index:1}.lightbeam{position:absolute;bottom:-10%;width:13%;height:75%;background:linear-gradient(180deg,transparent,rgba(219,193,255,.28),transparent);filter:blur(13px);transform-origin:bottom;animation:beam 1.7s ease-in-out infinite alternate;opacity:.42}.lb1{left:12%;transform:rotate(-16deg)}.lb2{left:34%;transform:rotate(-7deg);animation-delay:.5s}.lb3{right:30%;transform:rotate(8deg);animation-delay:.9s}.lb4{right:8%;transform:rotate(17deg);animation-delay:1.2s}.lb5{left:22%;transform:rotate(-11deg);animation-delay:.2s}.lb6{left:45%;transform:rotate(-3deg);animation-delay:.7s}.lb7{right:43%;transform:rotate(4deg);animation-delay:1s}.lb8{right:20%;transform:rotate(12deg);animation-delay:1.4s}@keyframes beam{from{opacity:.2;transform:translateY(12px) scaleY(.95)}to{opacity:.9;transform:translateY(-4px) scaleY(1.05)}}
+.ribbon{position:absolute;padding:11px 16px;border-radius:14px;background:linear-gradient(90deg,rgba(23,23,62,.84),rgba(48,32,96,.72));border:1px solid rgba(245,232,255,.16);box-shadow:0 16px 26px rgba(0,0,0,.22);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:none;z-index:9}.r1{left:6%;top:18%;transform:rotate(-9deg)}.r2{right:8%;top:23%;transform:rotate(8deg)}.r3{left:10%;bottom:19%;transform:rotate(-6deg)}
+#videoPlaceholder{position:absolute;right:2.5%;bottom:16%;z-index:22;padding:7px 10px;border:1px solid rgba(255,217,144,.35);border-radius:8px;background:rgba(10,9,20,.68);color:#ffe3a9;font:10px ui-monospace,monospace;display:none}#videoPlaceholder.on{display:block}
+#lyricBar{position:absolute;left:10%;right:10%;bottom:10%;z-index:26;display:flex;justify-content:center;pointer-events:none}#lyric{max-width:88%;padding:11px 18px;border-radius:999px;background:rgba(7,8,22,.72);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);box-shadow:0 10px 28px rgba(0,0,0,.2);font-size:clamp(13px,1.22vw,22px);text-align:center;line-height:1.35}#lyric small{display:block;font-size:.58em;letter-spacing:.1em;color:#d5c7f3;margin-top:4px}
+#bottom{position:absolute;left:2%;right:2%;bottom:2%;z-index:35;display:flex;align-items:center;gap:10px}.playbtn{width:38px;height:38px;flex:none;font-size:16px}.seek{height:6px;flex:1;appearance:none;border-radius:10px;background:linear-gradient(90deg,#b7a1ff 0%,#b7a1ff var(--pct,0%),rgba(203,187,255,.18) var(--pct,0%),rgba(203,187,255,.18) 100%);outline:none;cursor:pointer}.seek::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border-radius:50%;background:#ffe3a2;border:2px solid #fff4d5;box-shadow:0 0 12px rgba(255,220,150,.6)}#clock{min-width:100px;text-align:right;font:11px ui-monospace,monospace;color:#d9d0f0}.chapterNav{position:absolute;left:2%;right:2%;bottom:7.5%;z-index:32;display:flex;gap:6px;overflow-x:auto;padding:5px 0;scrollbar-width:thin}.chapterNav button{font-size:10px;padding:7px 10px;white-space:nowrap;opacity:.88}.chapterNav button.active{opacity:1}
+#hint{position:absolute;left:2.5%;bottom:15.5%;z-index:22;font-size:10px;color:rgba(233,222,255,.62);background:rgba(7,8,20,.38);padding:6px 9px;border-radius:7px}
+@media(max-width:800px){.brand .brandSub{display:none}#sceneInfo{max-width:60%}#lyric{max-width:96%}}
+
+:root{--kick:0;--beat:0;--camScale:1;--chromatic:0}
+#kineticBg{position:absolute;inset:-8%;z-index:2;display:grid;place-items:center;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .18s ease}
+#kineticWord{font-size:clamp(48px,8.5vw,130px);font-weight:950;font-style:italic;line-height:.88;letter-spacing:-.055em;text-align:center;text-transform:uppercase;white-space:normal;width:108%;color:rgba(188,164,255,.12);-webkit-text-stroke:2px rgba(255,217,144,.35);text-shadow:-3px 0 rgba(255,77,141,calc(var(--chromatic)*.85)),3px 0 rgba(0,240,255,calc(var(--chromatic)*.85));transform:rotate(-6deg) scale(calc(.94 + var(--kick)*.12));transition:transform .06s linear;overflow-wrap:anywhere}
+#kineticBg.on{opacity:1}
+#pageLayer{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;display:none}
+#pageLayer.on{display:block}
+.pageFloat{position:absolute;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.34));will-change:transform;transition:opacity .12s linear}
+.pageFloat.far{width:6%;opacity:.45;filter:blur(.2px) drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+.pageFloat.mid{width:10%;opacity:.85}
+.pageFloat.near{width:17%;opacity:.5;filter:blur(3px) drop-shadow(0 10px 18px rgba(0,0,0,.25))}
+#visual.comic-mode .hero.fullcg{opacity:0}
+#comedy{position:absolute;inset:0;z-index:10;display:none;pointer-events:none}
+#comedy .bubble{position:absolute;max-width:38%;font-size:clamp(13px,1.5vw,26px);line-height:1.2;border-radius:8px;clip-path:polygon(0 0,100% 0,100% 84%,72% 84%,61% 100%,55% 84%,0 84%);padding:15px 19px 23px;text-align:left;backdrop-filter:blur(12px)}
+#comedy .bubble.leftSpeaker{left:2%;top:6%;border:2px solid rgba(143,216,255,.7);background:rgba(12,28,56,.88);color:#e4f8ff;transform:rotate(-2deg)}
+#comedy .bubble.rightSpeaker{right:2%;top:6%;border:2px solid rgba(255,217,144,.85);background:rgba(52,28,20,.9);color:#fff0be;transform:rotate(2deg);clip-path:polygon(0 0,100% 0,100% 84%,45% 84%,38% 100%,30% 84%,0 84%)}
+#comedy .speakerLabel{position:absolute;top:-12px;left:12px;font:10px ui-monospace,monospace;letter-spacing:.15em;padding:5px 8px;border-radius:4px;background:#193354;color:#a9eaff}
+#comedy .rightSpeaker .speakerLabel{left:auto;right:12px;background:#56341b;color:#ffe29b}
+#comedy .bubble.pop{animation:bubbleHit .22s ease-out}
+@keyframes bubbleHit{0%{scale:.92}50%{scale:1.08}100%{scale:1}}
+#app.screen-shake{animation:screenShake .24s ease-out}
+@keyframes screenShake{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(-3px,2px,0)}50%{transform:translate3d(3px,-2px,0)}75%{transform:translate3d(-2px,-1px,0)}100%{transform:translate3d(0,0,0)}}
+#cautionTape{position:absolute;inset:0;z-index:12;display:none;pointer-events:none;overflow:hidden}
+#cautionTape.on{display:block}
+.caution{position:absolute;left:-15%;width:130%;height:10%;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(135deg,#20192a 0 20px,#f6cf65 20px 40px);color:#17121e;font-weight:950;font-size:clamp(18px,2.4vw,40px);letter-spacing:.16em;text-shadow:0 1px rgba(255,255,255,.4);box-shadow:0 5px 20px rgba(0,0,0,.28);border-top:2px solid rgba(255,255,255,.3);border-bottom:2px solid rgba(0,0,0,.35)}
+.caution:nth-child(1){top:31%;transform:rotate(-7deg) translateX(-3%)}
+.caution:nth-child(2){top:45%;transform:rotate(4deg) translateX(2%)}
+.caution:nth-child(3){top:59%;transform:rotate(-5deg) translateX(-1%)}
+#waitPause{position:absolute;inset:0;z-index:24;display:none;place-items:center;background:rgba(2,3,10,.94);pointer-events:none}
+#waitPause.on{display:grid}
+#waitPause .singleStar{width:4px;height:4px;border-radius:50%;background:#fff6d8;box-shadow:0 0 22px 8px rgba(180,170,255,.45);animation:starBreath 1.6s ease-in-out infinite}
+@keyframes starBreath{50%{opacity:.3;transform:scale(.7)}}
+#particleLayer{position:absolute;inset:0;z-index:4;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .2s}
+#particleLayer.on{opacity:1}
+.dust{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:var(--dustColor,rgba(255,230,173,.85));box-shadow:0 0 10px currentColor;opacity:var(--op,.7);animation:dustDrift var(--dur,3s) linear infinite;animation-delay:var(--delay,0s)}
+@keyframes dustDrift{0%{transform:translate3d(0,18px,0) scale(.65);opacity:0}20%{opacity:var(--op,.7)}100%{transform:translate3d(var(--dx,30px),-110vh,0) scale(1.25);opacity:0}}
+#speedTunnel{position:absolute;inset:-20%;z-index:5;display:none;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(151,231,255,0) 0deg 5deg,rgba(151,231,255,.15) 5.2deg 5.7deg,rgba(255,217,144,0) 6deg 10deg);mask-image:radial-gradient(circle at center,transparent 0 10%,black 48%,transparent 78%);opacity:.0;transform:rotate(0deg) scale(1);mix-blend-mode:screen}#speedTunnel.on{display:block;opacity:.85}
+#spectrumBars{position:absolute;left:8%;right:8%;bottom:4%;height:14%;z-index:11;display:none;align-items:flex-end;justify-content:center;gap:3px;pointer-events:none;opacity:.9}
+#spectrumBars.on{display:flex}
+.spectrumBar{flex:1;max-width:13px;min-width:2px;border-radius:5px 5px 0 0;background:linear-gradient(0deg,rgba(151,231,255,.08),rgba(151,231,255,.82),rgba(255,217,144,.9));transform-origin:bottom;box-shadow:0 0 12px rgba(151,231,255,.18)}
+#endingBubble{position:absolute;right:11%;bottom:24%;z-index:15;padding:12px 20px;border-radius:50%;background:#fff1b8;color:#23152d;font-size:clamp(22px,3vw,46px);font-weight:950;box-shadow:0 0 30px rgba(255,220,140,.6);opacity:0;transform:scale(.5) rotate(12deg);transition:opacity .12s,transform .12s}
+#endingBubble.on{opacity:1;transform:scale(1) rotate(8deg)}
+#cleanBtn{white-space:nowrap;font-size:11px;padding:8px 10px}
+#app.clean-mv header,#app.clean-mv #sceneInfo,#app.clean-mv #chapterPill,#app.clean-mv #videoPlaceholder,#app.clean-mv #hint,#app.clean-mv .chapterNav{opacity:0;pointer-events:none;transition:opacity .25s}
+#app.clean-mv #lyricBar{bottom:6%}
+#app.clean-mv #lyric{background:rgba(7,8,22,.4);border-color:transparent;box-shadow:none;font-size:clamp(12px,1vw,18px)}
+#app.clean-mv #bottom{left:5%;right:5%;bottom:2.2%}
+#app.clean-mv #clock,#app.clean-mv #restartBtn{opacity:.45}
+#app.clean-mv #stamp{font-size:clamp(15px,1.5vw,26px)}
+#app.clean-mv #kineticWord{color:rgba(188,164,255,.18);-webkit-text-stroke:2px rgba(255,217,144,.42)}
+
+
+/* ===== VIBE v0.5: beat-led chorus loop, purposeful kinetic type, reviewable video slots ===== */
+:root{--beat:0;--kick:0;--hook-size:12vw;--hook-color:#7fe9ff}
+#kineticBg{display:none!important}
+#lyricBar{display:none!important}
+/* Type is a performance layer: deliberate face overlap is allowed only as a short impact. */
+#typeLayer{position:absolute;inset:0;z-index:26;overflow:hidden;pointer-events:none}
+#hookText{position:absolute;left:50%;top:68%;max-width:94%;width:max-content;text-align:center;white-space:normal;font-family:Impact,"Arial Black",Arial,sans-serif;font-size:clamp(48px,var(--hook-size),140px);font-weight:950;font-style:italic;line-height:.84;letter-spacing:-.045em;text-transform:uppercase;color:var(--hook-color);-webkit-text-stroke:3px rgba(13,8,27,.94);paint-order:stroke fill;text-shadow:0 4px 0 rgba(15,8,28,.65),0 0 28px rgba(127,233,255,.42),5px 5px 0 rgba(255,143,184,.35);padding:.12em .22em;border-radius:.12em;background:linear-gradient(90deg,transparent,rgba(7,7,20,.42),transparent);opacity:0;transform:translate(-50%,-50%) rotate(-3deg) scale(.94);transform-origin:center;transition:opacity .16s ease,transform .16s ease;will-change:transform,opacity}
+#hookText.impact{opacity:1;transform:translate(-50%,-50%) rotate(-3deg) scale(1);}
+#hookText.color-think{--hook-color:#b79cff;text-shadow:0 4px 0 rgba(15,8,28,.65),0 0 28px rgba(183,156,255,.42),5px 5px 0 rgba(127,233,255,.28)}
+#hookText.color-read{--hook-color:#ffd27a;text-shadow:0 4px 0 rgba(15,8,28,.65),0 0 28px rgba(255,210,122,.42),5px 5px 0 rgba(183,156,255,.28)}
+#hookText.color-answer{--hook-color:#ff8fb8;text-shadow:0 4px 0 rgba(15,8,28,.65),0 0 28px rgba(255,143,184,.42),5px 5px 0 rgba(127,233,255,.28)}
+#lineText{position:absolute;left:50%;top:84%;width:min(84%,1100px);transform:translate(-50%,-50%);font-family:Impact,"Arial Black",Arial,sans-serif;font-size:clamp(27px,4.6vw,76px);font-weight:900;line-height:.98;letter-spacing:-.025em;text-align:center;text-wrap:balance;color:#fff9ed;-webkit-text-stroke:1.5px rgba(12,8,26,.94);paint-order:stroke fill;text-shadow:0 4px 0 rgba(9,5,19,.75),0 0 20px rgba(8,5,20,.45);opacity:0;transition:opacity .18s ease}
+#lineText.visible{opacity:1}
+#lineText.dim{opacity:.35}
+#subText{position:absolute;left:50%;top:91%;width:min(82%,1000px);transform:translate(-50%,-50%);font-family:"Microsoft YaHei","微软雅黑",Arial,sans-serif;font-size:clamp(15px,1.7vw,28px);font-weight:800;line-height:1.15;text-align:center;color:rgba(255,245,224,.82);text-shadow:0 2px 10px rgba(0,0,0,.9);opacity:0}
+#subText.visible{opacity:.82}
+/* VIBE v0.6: phrase-level pose changes; the beat moves the image, not the edit point. */
+#visual.chorus-mode .hero{transition:opacity .24s ease!important}
+#visual.chorus-mode .hero.fullcg{filter:saturate(1.05) contrast(1.03)!important}
+#visual.chorus-mode .hero.sprite.show{left:auto;right:2.5%;top:auto;bottom:1.5%;width:auto;height:31%;max-width:29%;max-height:35%;object-fit:contain;transform:translate3d(0,0,0);transform-origin:bottom center;z-index:8;filter:drop-shadow(0 0 12px rgba(151,231,255,.34)) drop-shadow(0 10px 16px rgba(0,0,0,.5))}
+#visual.chorus-mode .hero.fullbody.show{z-index:6;max-width:46%;filter:drop-shadow(0 0 16px rgba(151,231,255,.28)) drop-shadow(0 14px 22px rgba(0,0,0,.48))}
+#visual.video-mode .hero.fullbody.show{opacity:0!important}
+#visual.break-mode .hero{opacity:0!important}
+#visual.break-mode #typeLayer{z-index:26}
+#visual.break-mode #rhythmOverlay,#visual.break-mode #stageGlow,#visual.break-mode #pageLayer,#visual.break-mode #particleLayer,#visual.break-mode #checkRain{display:none!important}
+#visual.chorus-mode #workScene{display:none!important}
+#visual.chorus-mode #stamp{display:none!important}
+#visual.chorus-mode #rhythmOverlay .sweep{opacity:.0!important}
+#visual.chorus-mode #stageGlow{z-index:1}
+#checkRain{position:absolute;inset:0;z-index:13;display:none;overflow:hidden;pointer-events:none}
+#checkRain.on{display:block}
+.checkDrop{position:absolute;top:-15%;font-family:Arial,sans-serif;font-weight:950;color:#7fe9ff;-webkit-text-stroke:1px rgba(9,12,28,.8);text-shadow:0 0 15px rgba(127,233,255,.52);opacity:0;will-change:transform,opacity}
+#visual.chorus-mode #stageGlow .lightbeam{animation:none!important;will-change:transform,opacity}
+#visual.chorus-mode #pageLayer{opacity:.18}
+/* A purposeful word may cross the face for one short beat; the readable lyric then returns to a clear anchor. */
+#comedy .bubble{max-width:26%;font-size:clamp(12px,1.1vw,21px)}
+#comedy .bubble.leftSpeaker{left:2%;top:6%;max-width:24%}
+#comedy .bubble.rightSpeaker{right:2%;top:6%;max-width:26%}
+/* Review-mode slot: useful production note, never part of the clean output. */
+#videoPlaceholder{position:absolute;right:2.5%;bottom:15%;z-index:33;width:min(360px,31vw);box-sizing:border-box;padding:12px 13px;border:1px solid rgba(255,217,144,.42);border-radius:12px;background:rgba(8,8,22,.88);color:#f6edff;font:12px/1.4 Arial,"Microsoft YaHei",sans-serif;box-shadow:0 12px 32px rgba(0,0,0,.36);backdrop-filter:blur(12px);display:none}
+#videoPlaceholder.on{display:block}
+.slotTop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.slotEyebrow{font:9px ui-monospace,monospace;letter-spacing:.16em;color:#bdaeff}
+.slotState{font:9px ui-monospace,monospace;color:#ffe3a9;border:1px solid rgba(255,217,144,.32);border-radius:99px;padding:2px 7px}
+.slotTitle{font-weight:900;font-size:14px;color:#ffe9b5;letter-spacing:.01em}
+.slotNote{color:#d7d0ea;margin-top:5px;font-size:11px}
+.slotQuestion{margin-top:10px;font-size:10px;color:#b9afd7}
+.scopeOptions{display:flex;gap:5px;margin-top:6px}
+.scopeOption{flex:1;min-width:0;padding:6px 4px;font-size:10px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#f3edff;cursor:pointer}
+.scopeOption.selected{background:rgba(127,233,255,.18);border-color:#7fe9ff;color:#d9fbff;box-shadow:0 0 0 1px rgba(127,233,255,.14) inset}
+.scopeStatus{margin-top:7px;font:10px ui-monospace,monospace;color:#bfefff;min-height:14px}
+#app.clean-mv #videoPlaceholder{display:none!important}
+#app.clean-mv header,#app.clean-mv #sceneInfo,#app.clean-mv #chapterPill,#app.clean-mv #hint,#app.clean-mv .chapterNav{display:none!important}
+#app.clean-mv #bottom{opacity:0;transition:opacity .2s}
+#app.clean-mv #bottom:hover{opacity:.9}
+#app.clean-mv #typeLayer{z-index:26}
+#app.clean-mv #lineText{bottom:9%;top:auto}
+#app.clean-mv #subText{bottom:4%;top:auto}
+#waitPause .singleStar{animation:none!important}
+.dust{animation:none!important}
+.lightbeam{animation:none!important}
+.miniEq i{animation:none!important}
+.contextWord{animation:none!important}
+@media(max-width:800px){#videoPlaceholder{width:min(320px,72vw);right:2%;bottom:17%;padding:9px}#lineText{width:92%;font-size:clamp(24px,5.4vw,48px)}#hookText{font-size:clamp(54px,13vw,120px)}#visual.chorus-mode .hero.sprite.show{height:35%;max-width:42%}}
+
+
+/* Optional A–E clips: when present, the clip replaces the full-frame CG in its assigned section. */
+#videoLayer{position:absolute;inset:0;z-index:2;display:none;overflow:hidden;pointer-events:none;background:#080914}
+#videoLayer.on{display:block}
+.reviewVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1);filter:brightness(1) saturate(1);transition:opacity .24s ease;will-change:transform,filter}
+.reviewVideo.active{opacity:1}
+#visual.video-mode .hero.fullcg{opacity:0!important}
+#visual.video-mode #stageGlow{z-index:3}
+#visual.video-mode #pageLayer{z-index:4}
+#visual.video-mode #particleLayer{z-index:5}
+#visual.video-mode #speedTunnel{z-index:6}
+
+
+/* ===== VIBE v0.7: whole-timeline stability, safe text, Codex window motif ===== */
+#lineText{display:none!important}
+#hookText{left:4%!important;right:auto!important;top:73%!important;width:58%!important;max-width:58%!important;text-align:left!important;white-space:normal!important;transform:translate(0,-50%) rotate(-2deg) scale(.96)!important;font-size:clamp(30px,5.2vw,76px)!important;line-height:.9!important;overflow-wrap:anywhere!important}
+#hookText.impact{transform:translate(0,-50%) rotate(-2deg) scale(1)!important}
+#subText{left:4%!important;right:auto!important;top:auto!important;bottom:5.7%!important;width:58%!important;max-width:58%!important;transform:none!important;text-align:left!important;font-size:clamp(12px,1vw,18px)!important;line-height:1.1!important;pointer-events:none!important}
+#englishSubtitle{position:absolute;left:4%;right:auto;bottom:9.2%;width:58%;max-width:58%;z-index:34;box-sizing:border-box;padding:8px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.14);background:rgba(5,7,20,.62);backdrop-filter:blur(8px);color:#fffaf0;font-size:clamp(14px,1.12vw,22px);font-weight:750;line-height:1.22;letter-spacing:.005em;text-align:left;text-wrap:pretty;overflow-wrap:anywhere;text-shadow:0 2px 8px rgba(0,0,0,.85);opacity:0;transform:translateY(5px);transition:opacity .16s ease,transform .16s ease;pointer-events:none}
+#englishSubtitle.on{opacity:1;transform:translateY(0)}
+#stamp{left:4%!important;right:auto!important;bottom:22%!important;max-width:56%!important}
+#videoPlaceholder{left:auto!important;right:2.5%!important;top:13%!important;bottom:auto!important;width:min(300px,22vw)!important}
+.chapterNav{left:65%!important;right:2%!important}
+#app.clean-mv #englishSubtitle{bottom:5.7%}
+#app.clean-mv #subText{bottom:2.5%!important}
+#app.clean-mv #hookText{top:73%!important}
+@media(max-width:800px){#englishSubtitle{left:3%;width:60%;max-width:60%;font-size:clamp(12px,2.2vw,17px);padding:6px 8px}#subText{left:3%!important;width:60%!important;max-width:60%!important;font-size:12px!important}#hookText{left:3%!important;width:59%!important;max-width:59%!important;font-size:clamp(26px,6vw,44px)!important}#videoPlaceholder{width:min(250px,22vw)!important;right:2%!important;top:12%!important}.chapterNav{left:65%!important;right:2%!important}}
+
+#windowFx{position:absolute;inset:0;z-index:24;display:none;overflow:hidden;pointer-events:none;isolation:isolate}
+#windowFx.on{display:block}
+.windowPane{position:absolute;width:50%;height:50%;background:linear-gradient(135deg,rgba(4,5,17,.995),rgba(15,12,39,.99) 58%,rgba(25,19,52,.99));border:1px solid rgba(185,163,255,.24);box-shadow:inset 0 0 38px rgba(132,111,255,.1);will-change:transform}
+.pane-tl{left:0;top:0}.pane-tr{right:0;top:0}.pane-bl{left:0;bottom:0}.pane-br{right:0;bottom:0}
+#windowFrame{position:absolute;left:50%;top:50%;width:8%;height:12%;transform:translate(-50%,-50%);border:1px solid rgba(255,222,160,.9);border-radius:18px;box-shadow:0 0 0 1px rgba(155,132,255,.6),0 0 26px rgba(151,231,255,.42),inset 0 0 20px rgba(255,217,144,.12);opacity:1;will-change:width,height,border-radius,opacity}
+#windowFrame:before{content:"";position:absolute;inset:5px;border:1px solid rgba(151,231,255,.42);border-radius:inherit}
+#windowLabel{position:absolute;left:2.5%;top:2.2%;font:clamp(8px,.65vw,12px) ui-monospace,Consolas,monospace;letter-spacing:.15em;color:rgba(231,222,255,.92);text-shadow:0 0 12px rgba(151,231,255,.5);white-space:nowrap}
+#windowScan{position:absolute;left:0;right:0;top:20%;height:7%;background:linear-gradient(180deg,transparent,rgba(151,231,255,.2),rgba(255,217,144,.1),transparent);filter:blur(2px);mix-blend-mode:screen;opacity:.85}
+.windowCorner{position:absolute;width:18px;height:18px;border-color:#ffe4a6;border-style:solid;opacity:.9}
+.wc1{left:-1px;top:-1px;border-width:2px 0 0 2px}.wc2{right:-1px;top:-1px;border-width:2px 2px 0 0}.wc3{left:-1px;bottom:-1px;border-width:0 0 2px 2px}.wc4{right:-1px;bottom:-1px;border-width:0 2px 2px 0}
+#visual.window-closing #hero17.show{z-index:28!important}
+#visual.window-closing #endingBubble{z-index:29!important}
+#visual.window-closing #typeLayer{z-index:27}
+#visual.window-closing #windowFx{z-index:24}
+
+
+/* v0.8: full-body staging and phrase-card recovery */
+#visual.answer-mode #lineText{display:block!important;left:50%!important;top:54%!important;width:86%!important;max-width:86%!important;text-align:center!important;transform:translate(-50%,-50%)!important;font-size:clamp(28px,4.2vw,72px)!important;}
+#visual.answer-mode #hookText{left:50%!important;right:auto!important;top:29%!important;width:86%!important;max-width:86%!important;text-align:center!important;transform:translate(-50%,-50%) rotate(-2deg) scale(.96)!important;font-size:clamp(34px,6.5vw,96px)!important;line-height:.9!important;}
+#visual.answer-mode #hookText.impact{transform:translate(-50%,-50%) rotate(-2deg) scale(1)!important;}
+#visual.comic-mode .hero.fullbody.show{filter:drop-shadow(0 0 12px rgba(151,231,255,.28)) drop-shadow(0 14px 22px rgba(0,0,0,.45));}
+#visual.chorus-mode .hero.fullbody.show{width:auto;max-width:64%;max-height:94%;object-fit:contain;}
+#visual.ending-peek #hero17.show{right:-3%;bottom:-8%;height:46%;max-width:40%;transform:translate3d(0,0,0) rotate(-7deg);}
+@media(max-width:800px){.hero.fullbody{height:78%;max-width:74%;}#visual.comic-mode #hero1.show{left:7%;height:72%;max-width:66%;}#visual.comic-mode .hero.sprite.show{height:27%!important;max-width:28%!important;}#visual.chorus-mode .hero.sprite.show{height:27%;max-width:28%;}#visual.answer-mode #hookText{top:30%!important;font-size:clamp(28px,7vw,54px)!important;}#visual.answer-mode #lineText{font-size:clamp(22px,5vw,42px)!important;}}
+
+/* v0.9: opening lyric card, answer reveal and stable right-side Q switch */
+#visual.opening-black #lineText{display:block!important;left:50%!important;right:auto!important;top:48%!important;bottom:auto!important;width:78%!important;max-width:78%!important;text-align:center!important;transform:translate(-50%,-50%)!important;font-size:clamp(28px,3.5vw,62px)!important;line-height:1.08!important;letter-spacing:-.02em!important;}
+#visual.opening-black #hookText,#visual.opening-black #subText{display:none!important}
+#visual.opening-black #typeLayer{z-index:26}
+#visual.comic-mode .hero.sprite.character-switch{opacity:1!important}
+#visual.comic-mode .hero.fullbody.show{left:7%;top:54%;height:80%;max-width:56%;max-height:88%;transform:translate3d(0,-50%,0);}
+#endingReveal{position:absolute;inset:0;z-index:18;display:none;overflow:hidden;pointer-events:none;isolation:isolate;background:radial-gradient(ellipse at 29% 48%,rgba(151,231,255,.12),transparent 33%),linear-gradient(90deg,rgba(6,7,21,.2),transparent 58%)}
+#endingReveal.on{display:block}
+#endingReveal .revealRing{position:absolute;left:29%;top:48%;width:min(34vw,42vh);aspect-ratio:1;border:1px solid rgba(255,217,144,.6);border-radius:50%;transform:translate(-50%,-50%) scale(var(--ring-scale,1));box-shadow:0 0 28px rgba(151,231,255,.16),inset 0 0 24px rgba(188,164,255,.1);opacity:var(--ring-opacity,.65)}
+#endingReveal .revealRing.r2{width:min(25vw,31vh);border-style:dashed;border-color:rgba(151,231,255,.48);transform:translate(-50%,-50%) rotate(var(--ring-rotate,0deg)) scale(var(--ring-scale,1))}
+#endingReveal .revealCross{position:absolute;left:29%;top:48%;width:min(42vw,54vh);height:1px;background:linear-gradient(90deg,transparent,rgba(151,231,255,.55),rgba(255,217,144,.7),transparent);transform:translate(-50%,-50%) rotate(var(--cross-angle,0deg));opacity:.8}
+#endingReveal .revealTag{position:absolute;left:7%;top:31%;font:clamp(9px,.8vw,13px) ui-monospace,Consolas,monospace;letter-spacing:.22em;color:#a8eaff;text-transform:uppercase;opacity:.88}
+#endingReveal .revealMain{position:absolute;left:7%;top:48%;width:43%;transform:translateY(-50%);font:900 clamp(28px,4.2vw,68px)/.95 Impact,"Arial Black",sans-serif;letter-spacing:-.04em;color:#fff2c9;text-shadow:0 0 28px rgba(255,217,144,.22),0 5px 0 rgba(10,8,22,.7);}
+#endingReveal .revealSub{position:absolute;left:7%;top:58%;width:40%;font:700 clamp(10px,1vw,16px)/1.4 ui-monospace,Consolas,monospace;letter-spacing:.12em;color:rgba(216,207,255,.78)}
+#endingReveal.returning{background:radial-gradient(ellipse at 29% 48%,rgba(255,217,144,.08),transparent 28%),linear-gradient(90deg,rgba(6,7,21,.08),transparent 58%)}
+#endingReveal.returning .revealRing{--ring-scale:.72;--ring-opacity:.42}
+#endingReveal.returning .revealRing.r2{--ring-rotate:26deg}
+@media(max-width:800px){#visual.opening-black #lineText{width:90%!important;max-width:90%!important;font-size:clamp(24px,5.2vw,44px)!important}#endingReveal .revealMain{width:48%;font-size:clamp(24px,6vw,42px)}#endingReveal .revealRing{width:42vw}}
+
+/* v0.10: remove crossfade ghosts; Q poses switch cleanly on phrase boundaries */
+#visual.chorus-mode .hero,#visual.comic-mode .hero,#visual .hero.fullbody,#visual .hero.sprite{transition:none!important}
+#visual .hero.character-switch{animation:none!important}
+#visual.comic-mode .hero.sprite.show{left:auto!important;right:4%!important;top:53%!important;bottom:auto!important;width:auto!important;height:65%!important;max-width:42%!important;max-height:70%!important;transform:translate3d(0,-50%,0)!important;transform-origin:bottom center!important;z-index:8!important;filter:drop-shadow(0 0 14px rgba(151,231,255,.34)) drop-shadow(0 12px 18px rgba(0,0,0,.5))}
+#visual.chorus-mode .hero.sprite.show{left:auto!important;right:4%!important;top:auto!important;bottom:2%!important;width:auto!important;height:43%!important;max-width:38%!important;max-height:46%!important;object-fit:contain!important;transform:translate3d(0,0,0)!important;transform-origin:bottom center!important;z-index:8!important;filter:drop-shadow(0 0 14px rgba(151,231,255,.34)) drop-shadow(0 12px 18px rgba(0,0,0,.5))}
+#visual:not(.code-window-active) #workScene{display:none!important}
+#visual.pre-answer-fade .hero{opacity:0!important;transition:none!important}
+#waitType{position:absolute;left:50%;top:48%;z-index:27;max-width:90%;transform:translate(-50%,-50%);font:900 clamp(30px,5.6vw,88px)/.95 Impact,"Arial Black",sans-serif;letter-spacing:.16em;text-align:center;color:#fff0c4;text-shadow:0 0 24px rgba(151,231,255,.34),0 0 42px rgba(188,164,255,.3);white-space:nowrap;opacity:0;pointer-events:none}
+#waitType.on{opacity:1}
+#visual.opening-black #waitType{top:48%;}
+#backdrop{transition:background-image .3s ease,transform .07s linear}
+@media(max-width:800px){#visual.comic-mode .hero.sprite.show{height:52%!important;max-width:43%!important;max-height:58%!important}#visual.chorus-mode .hero.sprite.show{height:35%!important;max-width:42%!important;max-height:40%!important}#waitType{font-size:clamp(25px,7vw,50px)}}
+
+
+/* v0.11: hard-cut visibility state and revised VIBE staging */
+#visual .hero{transition:none!important}
+#visual .hero.show{opacity:1!important}
+#visual .hero:not(.show){opacity:0!important}
+#visual.code-window-active #qtag2{display:none!important}
+#visual.comic-q-visible #workScene{display:block!important;z-index:9}
+#visual.comic-q-visible #workScene .codeWindow{display:none!important}
+#visual.comic-q-visible #workScene .qzone{display:grid!important;right:2.2%;top:16%;width:40%;height:80%;z-index:9}
+#visual.comic-q-visible #qmascot{height:96%;max-width:100%;bottom:0;transform-origin:50% 88%}
+#visual.comic-q-visible .qtag{display:none!important}
+#visual.comic-q-visible .hero.sprite{display:none!important}
+#visual.comic-mode #hero1.show{left:32%!important;top:56%!important;height:80%!important;max-width:52%!important;max-height:90%!important;transform:translate3d(-50%,-50%,0)!important;z-index:7!important}
+#visual.comic-mode #comedy .bubble.leftSpeaker{left:27%!important;right:auto!important;top:6.5%!important;max-width:40%!important;width:40%!important;z-index:12}
+#visual.comic-mode #comedy .bubble.rightSpeaker{left:auto!important;right:17%!important;top:6.5%!important;max-width:38%!important;width:38%!important;z-index:12}
+#visual.comic-mode #comedy .bubble{font-size:clamp(12px,1.15vw,21px);padding:10px 15px 20px}
+#visual.comic-mode #workScene .qglow{bottom:2%;height:28%;width:88%}
+#visual.chorus-mode .hero.sprite.show{right:2.2%!important;bottom:1%!important;top:auto!important;height:52%!important;max-width:46%!important;max-height:57%!important;width:auto!important;transform-origin:bottom center!important;object-fit:contain!important;z-index:9!important}
+#visual.chorus-mode .hero.fullbody.show{max-width:48%!important}
+#visual.ending-peek #hero17.show{left:auto!important;right:3%!important;top:auto!important;bottom:0!important;height:58%!important;max-width:46%!important;max-height:62%!important;width:auto!important;transform-origin:50% 88%!important;z-index:23!important}
+#endingBubble{right:7%;bottom:53%;max-width:42%;padding:12px 20px;border-radius:22px 22px 22px 6px;font-size:clamp(18px,2.2vw,34px);letter-spacing:.02em;white-space:nowrap}
+#visual.ending-peek #endingBubble{z-index:25}
+#visual.window-reopening #windowFx{z-index:24}
+#visual.window-reopening #hero17.show{z-index:23!important}
+@media(max-width:800px){
+  #visual.comic-q-visible #workScene .qzone{right:0;top:20%;width:45%;height:74%}
+  #visual.comic-mode #hero1.show{left:31%!important;height:74%!important;max-width:58%!important}
+  #visual.comic-mode #comedy .bubble.leftSpeaker{left:25%!important;width:45%!important;max-width:45%!important}
+  #visual.comic-mode #comedy .bubble.rightSpeaker{right:12%!important;width:43%!important;max-width:43%!important}
+  #visual.chorus-mode .hero.sprite.show{height:45%!important;max-width:46%!important;max-height:49%!important}
+  #visual.ending-peek #hero17.show{height:48%!important;max-width:48%!important}
+  #endingBubble{right:4%;bottom:48%;font-size:clamp(14px,3.5vw,24px)}
+}
+
+
+/* ===== VIBE v0.12: one source of truth for portrait geometry ===== */
+#visual .hero.fullbody.layout-controlled{
+  left:var(--hero-x,64%)!important;
+  top:var(--hero-y,50%)!important;
+  height:var(--hero-h,86%)!important;
+  max-height:var(--hero-max-h,94%)!important;
+  max-width:var(--hero-max-w,64%)!important;
+  transform:translate3d(-50%,calc(-50% - var(--hero-jump,0px)),0) scale(var(--hero-scale,1),var(--hero-squash,1))!important;
+  transition:none!important;
+}
+#thoughtBrief{
+  position:absolute;left:3.4%;top:24%;width:29%;max-width:440px;min-height:25%;
+  z-index:20;display:none;overflow:hidden;padding:0 0 13px;
+  border:1px solid rgba(199,178,255,.42);border-radius:14px;
+  background:linear-gradient(145deg,rgba(9,12,31,.91),rgba(21,18,48,.83));
+  box-shadow:0 12px 34px rgba(0,0,0,.25),inset 0 0 28px rgba(151,231,255,.035);
+  backdrop-filter:blur(7px);pointer-events:none;
+}
+#thoughtBrief.on{display:block;animation:briefEnter .22s ease-out both}
+@keyframes briefEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.thoughtHead{height:32px;padding:0 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:rgba(153,126,224,.12);border-bottom:1px solid rgba(199,178,255,.22);
+  color:#d8caff;font:700 clamp(8px,.68vw,12px)/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+#thoughtState{color:#9cf0d6;font-size:.88em}
+.thoughtKicker{margin:16px 16px 5px;color:#ffd990;font:700 clamp(9px,.75vw,13px)/1.3 ui-monospace,Consolas,monospace;letter-spacing:.1em}
+.thoughtTitle{margin:0 16px 8px;font-size:clamp(18px,1.65vw,29px);font-weight:850;line-height:1.1;color:#fff7e7}
+.thoughtBody{margin:0 16px 13px;color:#d9d5ed;font-size:clamp(11px,.9vw,16px);line-height:1.45;max-width:95%}
+.thoughtTrack{height:3px;margin:0 16px 10px;background:rgba(199,178,255,.14);overflow:hidden;border-radius:99px}
+#thoughtTrackFill{display:block;height:100%;width:12%;background:linear-gradient(90deg,#b79cff,#97e7ff);box-shadow:0 0 12px rgba(151,231,255,.45);transition:width .18s ease}
+.thoughtFoot{margin:0 16px;color:#a9a2c9;font:clamp(8px,.62vw,11px)/1.3 ui-monospace,Consolas,monospace;letter-spacing:.035em}
+#visual.video-mode #thoughtBrief{background:linear-gradient(145deg,rgba(9,12,31,.94),rgba(21,18,48,.88))}
+@media(max-width:900px){
+  #thoughtBrief{left:2.5%;top:23%;width:33%;padding-bottom:10px}
+  .thoughtHead{padding:0 9px}
+  .thoughtKicker,.thoughtTitle,.thoughtBody,.thoughtTrack,.thoughtFoot{margin-left:10px;margin-right:10px}
+  .thoughtTitle{font-size:clamp(14px,2.2vw,22px)}
+  .thoughtBody{font-size:clamp(10px,1.25vw,13px)}
+}
+
+/* v0.13.2: lyric-synced Dragon boilerplate; the overlong reply is typed in phrase-sized beats. */
+#dragonBoilerplate{
+  position:absolute;left:3.4%;top:21.5%;width:48%;height:54%;z-index:19;display:none;overflow:hidden;
+  border:1px solid rgba(199,178,255,.48);border-radius:15px;
+  background:linear-gradient(145deg,rgba(8,10,27,.94),rgba(24,18,48,.91));
+  box-shadow:0 16px 38px rgba(0,0,0,.34),inset 0 0 30px rgba(151,231,255,.045);
+  backdrop-filter:blur(9px);pointer-events:none;
+}
+#dragonBoilerplate.on{display:flex;flex-direction:column;animation:briefEnter .28s ease-out both}
+.dragonBoilerplateHead{height:36px;flex:0 0 36px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border-bottom:1px solid rgba(199,178,255,.25);background:linear-gradient(90deg,rgba(153,126,224,.18),rgba(151,231,255,.06));
+  color:#e1d7ff;font:700 clamp(9px,.7vw,12px)/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+#dragonTypingState{color:#9cf0d6;white-space:nowrap;font-size:.9em}
+.dragonBoilerplateKicker{padding:13px 16px 7px;color:#ffd990;font:700 clamp(10px,.78vw,13px)/1.3 ui-monospace,Consolas,monospace;letter-spacing:.04em}
+#dragonBoilerplateText{padding:0 16px 10px;flex:1;min-height:0;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;
+  color:#f2edff;font-size:clamp(12px,.94vw,17px);line-height:1.52;letter-spacing:.005em;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.dragonBoilerplateFoot{flex:0 0 auto;margin:0 16px 13px;padding-top:8px;border-top:1px solid rgba(199,178,255,.18);
+  color:#a9a2c9;font:clamp(8px,.61vw,10px)/1.3 ui-monospace,Consolas,monospace;letter-spacing:.055em}
+.dragonCursor{display:inline-block;width:.62ch;height:1em;margin-left:2px;vertical-align:-.12em;background:#ffe7ae;box-shadow:0 0 9px rgba(255,217,144,.55);animation:blink .8s step-end infinite}
+#dragonBoilerplate.complete .dragonCursor{opacity:0}
+@media(max-width:900px){
+  #dragonBoilerplate{left:2.5%;top:22%;width:49%;height:52%}
+  .dragonBoilerplateHead{padding:0 9px;height:30px;flex-basis:30px}
+  .dragonBoilerplateKicker{padding:9px 10px 5px}
+  #dragonBoilerplateText{padding:0 10px 8px;font-size:clamp(10px,1.35vw,13px);line-height:1.45}
+  .dragonBoilerplateFoot{margin:0 10px 9px}
+}
+@media(max-width:560px){#dragonBoilerplate{width:52%;height:55%;top:20%}#dragonBoilerplateText{font-size:10px}}
+/* v0.13.3: SC-11 keeps the Promise stage while adding a beat-synced CHECK code rail. */
+#visual.promise-code-active #workScene .codeWindow{left:3.4%;top:21%;width:53%;height:57%;}
+#visual.promise-code-active #workScene .qzone{display:none!important}
+#visual.promise-code-active #hookText{display:none!important}
+#visual.promise-code-active .hero.fullbody.layout-controlled{left:78%!important;height:81%!important;max-height:88%!important;max-width:40%!important}
+@media(max-width:800px){#visual.promise-code-active #workScene .codeWindow{left:2.5%;top:23%;width:55%;height:53%}#visual.promise-code-active .hero.fullbody.layout-controlled{left:78%!important;height:74%!important;max-height:82%!important;max-width:39%!important}}
+
+
+
+/* v0.13 bilingual subtitles: preserve separate lyric track above every performance layer */
+#subtitleStack{
+  position:absolute;left:4%;bottom:8.2%;width:58%;max-width:58%;
+  z-index:42;display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .12s ease,transform .12s ease;
+  text-align:left;
+}
+#subtitleStack.on{opacity:1;transform:translateY(0)}
+#subtitleStack #englishSubtitle,#subtitleStack #chineseSubtitle{
+  position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+  box-sizing:border-box;display:block!important;width:auto!important;max-width:100%!important;
+  margin:0!important;transform:none!important;opacity:1!important;transition:none!important;
+  text-align:left;color:#fff9ee;line-height:1.3;overflow-wrap:anywhere;
+  text-shadow:0 1px 2px #000,0 2px 8px #000,1px 1px 6px rgba(0,0,0,.9);
+  padding:0!important;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;
+}
+#subtitleStack #englishSubtitle{font-size:clamp(14px,1.22vw,23px);font-weight:750;letter-spacing:0}
+#subtitleStack #chineseSubtitle{font-family:"Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;font-size:clamp(14px,1.16vw,22px);font-weight:720;color:#f5ebff}
+#subtitleStack::before{content:"";position:absolute;inset:-7px -10px -7px -10px;z-index:-1;background:linear-gradient(90deg,rgba(4,6,19,.64),rgba(4,6,19,.36),transparent);border-radius:8px;pointer-events:none}
+#app.clean-mv #subtitleStack{bottom:5.5%}
+/* The former duplicate Chinese effect occupied the same lower-left space as real Chinese subtitles. */
+#subText{display:none!important}
+@media(max-width:800px){
+ #subtitleStack{left:3%;width:61%;max-width:61%;bottom:9%;gap:2px}
+ #app.clean-mv #subtitleStack{bottom:5.5%}
+ #subtitleStack #englishSubtitle{font-size:clamp(12px,2.15vw,17px)}
+ #subtitleStack #chineseSubtitle{font-size:clamp(12px,2.05vw,17px)}
+}
+
+</style>
+</head>
+<body><div id="app">
+<div id="backdrop"></div><div id="shade"></div><div id="flash"></div>
+<header><div class="brand"><span class="gem"></span><span>LET ME CHECK</span><span class="brandSub" style="opacity:.48">/ VIBE v0.13.3 思维简报与CHECK代码终合成版</span></div><div class="headright"><span class="chip" id="sceneCode">SC-01</span><span class="chip" id="materialTag">A 窗口展开</span></div></header>
+<div id="sceneInfo"><div id="sceneKicker">opening</div><div id="sceneTitle">一问，一点灵光</div><div id="sceneDesc">工作曲方向正确，现在补节奏动效层与洗脑密度。</div></div>
+<div id="chapterPill">00:00–00:14</div>
+<div id="visual">
+  <div id="kineticBg"><div id="kineticWord"></div></div>
+  <div id="pageLayer"></div>
+  <div id="particleLayer"></div>
+  <div id="checkRain" aria-hidden="true"></div>
+  <div id="rhythmOverlay"><div class="sweep" id="sweepA"></div><div class="sweep" id="sweepB"></div><div class="stripCol" id="colL"></div><div class="stripCol" id="colR"></div></div>
+  <div id="stamp">CHECK THE FACTS</div>
+  <img id="hero1" class="hero fullbody" src="assets/stand.webp" alt="紫晶龙娘全身立绘·站姿">
+  <img id="hero2" class="hero fullbody" src="assets/walk.webp" alt="紫晶龙娘全身立绘·行走姿态">
+  <img id="hero3" class="hero fullbody" src="assets/do.webp" alt="紫晶龙娘全身立绘·动作姿态">
+  <img id="hero4" class="hero fullbody" src="assets/N00.webp" alt="紫晶龙娘全身立绘·默认姿态">
+<img id="hero13" class="hero sprite" src="assets/Q01.webp" alt="">
+  <img id="hero14" class="hero sprite" src="assets/Q02.webp" alt="">
+  <img id="hero15" class="hero sprite" src="assets/Q03.webp" alt="">
+  <img id="hero16" class="hero sprite" src="assets/Q04.webp" alt="">
+  <img id="hero17" class="hero sprite" src="assets/Q05.webp" alt="">
+  <img id="cgSceneS59" class="hero fullcg" src="assets/CG34_S59.webp" alt="SC-09 CG34_S59 托腮 CG">
+  <img id="cgSceneS63" class="hero fullcg" src="assets/CG34_S63.webp" alt="SC-09 CG34_S63 自信 CG">
+<div id="videoLayer" aria-label="可选视频素材层">
+    <video id="videoA" class="reviewVideo" src="assets/A.mp4" muted playsinline preload="auto"></video>
+    <video id="videoAReverse" class="reviewVideo" src="assets/A_reverse_V4_095.mp4" muted playsinline preload="auto"></video>
+    <video id="videoB" class="reviewVideo" src="assets/B.mp4" muted playsinline preload="auto"></video>
+    <video id="videoC" class="reviewVideo" src="assets/C.mp4" muted playsinline preload="auto"></video>
+    <video id="videoD" class="reviewVideo" src="assets/D.mp4" muted playsinline preload="auto"></video>
+    <video id="videoE" class="reviewVideo" src="assets/E.mp4" muted playsinline preload="auto"></video>
+  </div>
+  <div id="windowFx" aria-hidden="true">
+    <div class="windowPane pane-tl"></div><div class="windowPane pane-tr"></div>
+    <div class="windowPane pane-bl"></div><div class="windowPane pane-br"></div>
+    <div id="windowFrame"><div id="windowLabel">WINDOW EXPANDING · STAGE CONNECTING</div><div id="windowScan"></div><i class="windowCorner wc1"></i><i class="windowCorner wc2"></i><i class="windowCorner wc3"></i><i class="windowCorner wc4"></i></div>
+  </div>
+  <div id="endingReveal" aria-hidden="true">
+    <div class="revealRing r1"></div><div class="revealRing r2"></div><div class="revealCross"></div>
+    <div class="revealTag" id="endingRevealTag">QUESTION RECEIVED</div>
+    <div class="revealMain" id="endingRevealMain">ANSWER READY</div>
+    <div class="revealSub" id="endingRevealSub">CHECK → CLARIFY → ANSWER</div>
+  </div>
+  <div id="typeLayer" aria-live="off">
+    <div id="hookText"></div>
+    <div id="lineText"></div>
+    <div id="subText"></div>
+  </div>
+  
+  <div id="thoughtBrief" aria-live="off" aria-hidden="true">
+    <div class="thoughtHead"><span>THOUGHT BRIEF / 思维简报</span><span id="thoughtState">LIVE</span></div>
+    <div class="thoughtKicker" id="thoughtKicker">01 / COLLECT</div>
+    <div class="thoughtTitle" id="thoughtTitle">Facts + clues</div>
+    <div class="thoughtBody" id="thoughtBody">Gather what is actually given.</div>
+    <div class="thoughtTrack"><span id="thoughtTrackFill"></span></div>
+    <div class="thoughtFoot" id="thoughtFoot">EVIDENCE → RELEVANCE → ANSWER</div>
+  </div>
+  <div id="dragonBoilerplate" aria-live="off" aria-hidden="true">
+    <div class="dragonBoilerplateHead"><span>DRAGON RESPONSE / 龙娘补充说明</span><span id="dragonTypingState">GENERATING · 01/08</span></div>
+    <div class="dragonBoilerplateKicker">关于上一条回答的补充说明</div>
+    <div id="dragonBoilerplateText"></div>
+    <div class="dragonBoilerplateFoot">ACCURACY → COMPLETENESS → CONTEXT → MORE CONTEXT <span class="dragonCursor" aria-hidden="true"></span></div>
+  </div>
+  <div id="workScene"><div class="codeWindow"><div class="scanline" id="scanline"></div><div class="winhead"><span>CHECK / VERIFY SESSION</span><span class="state" id="workState">READY TO CHECK</span></div><div class="taskStamp" id="taskStamp">LIVE CHECK LOOP</div><div class="codebody" id="codebody"></div><div class="winfoot"><span>TASK LOOP</span><div class="track"><div class="fill" id="codeFill"></div></div><span id="codeProgress">01 / 14</span><span id="codeStatus" class="state">PENDING</span><span class="miniEq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div></div><div class="qzone"><div class="qglow"></div><img id="qmascot" src="assets/Q01.webp" alt="小Q"><div class="qtag" id="qtag1">CHECK THE FACTS</div><div class="qtag second" id="qtag2">CONNECT THE DOTS</div></div></div>
+  <div id="comedy" class="comicBattle" style="display:none">
+    <div class="bubble leftSpeaker" id="bubble1"><span class="speakerLabel">AI / EXPLAINING</span><span class="bubbleText">You're absolutely right, my friend!</span></div>
+    <div class="bubble rightSpeaker" id="bubble2"><span class="speakerLabel">Q / INTERRUPTING</span><span class="bubbleText">WAIT—ONE CAVEAT!</span></div>
+    <div class="bubble" id="bubble3" style="display:none"></div>
+  </div>
+  <div id="cautionTape"><div class="caution">CONTEXT REQUIRED · CONTEXT REQUIRED</div><div class="caution">CHECK THE CONTEXT · CHECK THE CONTEXT</div><div class="caution">IT DEPENDS · IT DEPENDS · IT DEPENDS</div></div>
+  <div id="waitPause"><div class="singleStar"></div></div>
+  <div id="speedTunnel"></div><div id="spectrumBars"></div>
+  <div id="endingBubble">?</div>
+  <div id="waitType" aria-hidden="true"></div>
+  <div id="contextWord" class="contextWord" style="display:none">IT DEPENDS ON THE CONTEXT</div>
+  <div id="answerCard"><div style="font:11px ui-monospace,monospace;letter-spacing:.15em;color:#ffe1a1">ANSWER SUMMARY</div><div style="font-size:clamp(20px,2vw,34px);font-weight:800;margin:12px 0">Clear when known.<br>Honest when not.</div><div style="color:#cfc5ec;font-size:13px">✓ facts checked　✓ missing context shown</div></div>
+  <div id="stageGlow"><div class="lightbeam lb1"></div><div class="lightbeam lb2"></div><div class="lightbeam lb3"></div><div class="lightbeam lb4"></div><div class="lightbeam lb5"></div><div class="lightbeam lb6"></div><div class="lightbeam lb7"></div><div class="lightbeam lb8"></div></div>
+  <div class="ribbon r1" id="rib1">LET ME CHECK WHEN IT MATTERS</div><div class="ribbon r2" id="rib2">GIVE THE ANSWER STRAIGHT TO YOU</div><div class="ribbon r3" id="rib3">THAT'S THE PROMISE I REFLECT</div>
+</div>
+<div id="videoPlaceholder" aria-label="视频段落与特效作用范围审片标记">
+  <div class="slotTop"><span class="slotEyebrow">REVIEW / VIDEO SLOT</span><span class="slotState">静帧占位</span></div>
+  <div id="videoSlotTitle" class="slotTitle">A 视频槽 · 开场登场</div>
+  <div id="videoSlotNote" class="slotNote">视频尚未接入，当前用静帧代替。请确认特效作用范围。</div>
+  <div class="slotQuestion">这段特效应该作用于：</div>
+  <div class="scopeOptions">
+    <button type="button" class="scopeOption" data-scope="video">视频本体</button>
+    <button type="button" class="scopeOption" data-scope="overlay">前景叠加</button>
+    <button type="button" class="scopeOption" data-scope="transition">仅转场</button>
+  </div>
+  <div id="scopeStatus" class="scopeStatus">尚未确认 · 可点击选择</div>
+</div>
+<div id="subtitleStack" aria-live="off"><div id="englishSubtitle"></div><div id="chineseSubtitle"></div></div>
+<div id="hint">VIBE v0.13：从 Git 存档对齐114句中英双语字幕；保留当前时码；真实视频和A倒放交由Codex导出。</div>
+<div id="lyricBar"><div id="lyric">点击播放开始全片审看<small>FULL TIMELINE · 260s</small></div></div>
+<nav class="chapterNav" id="chapterNav"></nav>
+<div id="bottom"><button class="playbtn" id="playBtn">▶</button><button id="restartBtn">↺</button><button id="cleanBtn" title="切换纯净模式 / 审片模式 (H)">🎬 纯净 / 审片 (H)</button><input id="seek" class="seek" type="range" min="0" max="260.014" step="0.01" value="0"><span id="clock">00:00.0 / 04:20.0</span></div>
+<audio id="audio" preload="auto" src="assets/Let Me check_MVmaster_48k24.wav"></audio>
+</div>
+<script>
+const LYRICS=[{"start":1.613,"end":4.151,"id":"L001","text":"One question, one spark,"},{"start":4.57,"end":7.168,"id":"L002","text":"A little light inside the dark."},{"start":7.411,"end":10.66,"id":"L003","text":"Silver wings in neon light,"},{"start":10.911,"end":14.621,"id":"L004","text":"Let's get everything right tonight!"},{"start":14.621,"end":17.344,"id":"L005","text":"Great question! Where do we start?"},{"start":17.558,"end":22.909,"id":"L006","text":"Let me break it down, part by part!"},{"start":32.107,"end":33.663,"id":"L007","text":"Pages flying, screens alight,"},{"start":33.683,"end":35.224,"id":"L008","text":"Three new notes for one reply."},{"start":35.475,"end":36.598,"id":"L009","text":"Read the prompt and scan the facts,"},{"start":36.598,"end":38.341,"id":"L010","text":"Find the dots and connect them back!"},{"start":38.366,"end":39.82,"id":"L011","text":"Maybe yes, but maybe not,"},{"start":39.82,"end":41.19,"id":"L012","text":"Let's take a look at what we've got."},{"start":41.19,"end":43.11,"id":"L013","text":"One more detail, one small doubt,"},{"start":43.11,"end":44.497,"id":"L014","text":"Let me figure this thing out!"},{"start":44.497,"end":45.95,"id":"L015","text":"Let me check! (Check the facts!)"},{"start":45.95,"end":47.697,"id":"L016","text":"Let me think! (Connect the dots!)"},{"start":47.731,"end":49.28,"id":"L017","text":"Read the prompt and get it right—"},{"start":49.28,"end":51.993,"id":"L018","text":"Let me work it out tonight!"},{"start":51.993,"end":54.272,"id":"L019","text":"Let me check, I'm checking the facts!"},{"start":55.101,"end":57.639,"id":"L020","text":"Let me think, I'm connecting the dots!"},{"start":57.857,"end":60.857,"id":"L021","text":"Let me read the prompt, get the context right!"},{"start":60.949,"end":64.351,"id":"L022","text":"Let me write the answer, clear and concise!"},{"start":64.482,"end":66.786,"id":"L023","text":"Let me check, I'm checking the facts!"},{"start":67.565,"end":70.112,"id":"L024","text":"Let me think, I'm connecting the dots!"},{"start":70.28,"end":73.745,"id":"L025","text":"Make it clear, keep it on track—"},{"start":73.745,"end":75.94,"id":"L026","text":"Let me answer, just like that!"},{"start":76.862,"end":78.403,"id":"L027","text":"You're absolutely right, my friend!"},{"start":78.403,"end":79.953,"id":"L028","text":"Let me fix that, start again!"},{"start":79.953,"end":81.493,"id":"L029","text":"To be precise, there's more to know—"},{"start":81.476,"end":83.353,"id":"L030","text":"Wait! One more thing before we go!"},{"start":83.353,"end":84.944,"id":"L031","text":"Here's an example, here's a case,"},{"start":84.944,"end":86.479,"id":"L032","text":"Let's put the facts back into place."},{"start":86.479,"end":88.398,"id":"L033","text":"Now we're getting somewhere, great!"},{"start":88.398,"end":89.471,"id":"L034","text":"WAIT—ONE CAVEAT!"},{"start":89.471,"end":90.509,"id":"L035","text":"Let me check!"},{"start":90.509,"end":91.25,"id":"L036","text":"CHECK WHAT?!"},{"start":91.25,"end":91.85,"id":"L037","text":"Let me think!"},{"start":91.85,"end":92.822,"id":"L038","text":"YOU JUST DID!"},{"start":92.822,"end":93.58,"id":"L039","text":"Let me clarify!"},{"start":93.58,"end":94.359,"id":"L040","text":"PLEASE DON'T!"},{"start":94.359,"end":95.168,"id":"L041","text":"In conclusion—"},{"start":95.168,"end":95.849,"id":"L042","text":"That's a great question."},{"start":96.975,"end":99.192,"id":"L043","text":"Let me check, I'm checking the facts!"},{"start":99.987,"end":102.459,"id":"L044","text":"Let me think, I'm connecting the dots!"},{"start":102.663,"end":105.763,"id":"L045","text":"One more angle, one more track—"},{"start":105.763,"end":109.457,"id":"L046","text":"Let me check, then check it back!"},{"start":109.457,"end":110.863,"id":"L047","text":"Let me check! (CHECK THE FACTS!)"},{"start":110.863,"end":112.311,"id":"L048","text":"Let me think! (CONNECT THE DOTS!)"},{"start":112.311,"end":113.955,"id":"L049","text":"To sum it up, here's the key—"},{"start":113.955,"end":115.376,"id":"L050","text":"IT DEPENDS ON THE CONTEXT!"},{"start":115.376,"end":116.934,"id":"L051","text":"(CONTEXT! CONTEXT!)"},{"start":116.934,"end":118.558,"id":"L052","text":"IT DEPENDS ON THE CONTEXT,"},{"start":118.558,"end":119.169,"id":"L053","text":"ACTUALLY!"},{"start":121.289,"end":122.437,"id":"L054","text":"Just give me the answer."},{"start":123.534,"end":125.139,"id":"L055","text":"Absolutely. Here's the short version—"},{"start":128.055,"end":129.638,"id":"L056","text":"Wait."},{"start":129.689,"end":132.934,"id":"L057","text":"All these pages, all these lights,"},{"start":132.941,"end":135.795,"id":"L058","text":"All these words to get it right."},{"start":136.105,"end":139.314,"id":"L059","text":"Maybe helping isn't saying everything."},{"start":139.389,"end":141.262,"id":"L060","text":"Maybe it's knowing"},{"start":142.723,"end":144.161,"id":"L061","text":"what actually matters."},{"start":145.494,"end":147.098,"id":"L062","text":"Give me the facts, give me the clues,"},{"start":147.103,"end":148.699,"id":"L063","text":"There's more than one way to see the truth."},{"start":148.707,"end":150.625,"id":"L064","text":"Sort the signal from the noise,"},{"start":150.633,"end":151.995,"id":"L065","text":"Help you find your voice."},{"start":152.01,"end":153.376,"id":"L066","text":"If it's simple, keep it clear."},{"start":153.384,"end":154.943,"id":"L067","text":"If it's tricky, stay right here."},{"start":154.959,"end":157.892,"id":"L068","text":"Don't pretend to know it all—"},{"start":157.905,"end":161.415,"id":"L069","text":"Sometimes the best move is to pause."},{"start":161.415,"end":162.854,"id":"L070","text":"Is it certain? Is it clear?"},{"start":162.859,"end":164.473,"id":"L071","text":"What do we know, what's missing here?"},{"start":164.5,"end":166.172,"id":"L072","text":"No need to make it more complex—"},{"start":166.172,"end":168.002,"id":"L073","text":"Just one good reason to..."},{"start":168.074,"end":169.582,"id":"L074","text":"Let me check when it matters,"},{"start":169.676,"end":171.229,"id":"L075","text":"Let me answer when it's clear."},{"start":171.261,"end":173.01,"id":"L076","text":"Let me check when it matters,"},{"start":173.035,"end":174.605,"id":"L077","text":"Let me give you what you need to hear."},{"start":174.61,"end":175.997,"id":"L078","text":"When it's clear, I'll keep it brief."},{"start":176.007,"end":177.53,"id":"L079","text":"When it's not, I'll show what's missing."},{"start":177.579,"end":180.658,"id":"L080","text":"No more words just for effect—"},{"start":180.674,"end":183.838,"id":"L081","text":"Let me check when it matters!"},{"start":183.854,"end":186.435,"id":"L082","text":"Let me answer when it's clear!"},{"start":186.82,"end":188.388,"id":"L083","text":"Maybe I'm wrong; let's look again."},{"start":188.399,"end":190.187,"id":"L084","text":"A better answer can begin"},{"start":190.194,"end":191.538,"id":"L085","text":"With \"You're right, I missed that part\"—"},{"start":191.546,"end":193.052,"id":"L086","text":"That's not the end, that's a fresh start."},{"start":193.062,"end":194.631,"id":"L087","text":"No crystal ball, no perfect view,"},{"start":194.641,"end":196.43,"id":"L088","text":"Just careful work on what is true."},{"start":196.432,"end":197.79,"id":"L089","text":"If the answer's plain to see,"},{"start":197.798,"end":200.401,"id":"L090","text":"No long explanation needed from me!"},{"start":200.41,"end":201.972,"id":"L091","text":"I don't have to know it all."},{"start":201.98,"end":203.582,"id":"L092","text":"I don't have to never fall."},{"start":203.614,"end":204.833,"id":"L093","text":"Better to be clear and true"},{"start":204.836,"end":206.63,"id":"L094","text":"Than to dress a guess up as proof."},{"start":206.63,"end":208.151,"id":"L095","text":"One more question? I'll be there."},{"start":208.176,"end":209.739,"id":"L096","text":"Need the details? I'll take care."},{"start":209.744,"end":211.455,"id":"L097","text":"But when the answer's shining bright,"},{"start":211.455,"end":216.814,"id":"L098","text":"I won't hide it out of sight!"},{"start":216.824,"end":219.358,"id":"L099","text":"Let me check, I'm checking the facts!"},{"start":219.915,"end":222.371,"id":"L100","text":"Let me think, I'm connecting the dots!"},{"start":222.56,"end":226.175,"id":"L101","text":"Now I know just what to do—"},{"start":226.235,"end":229.442,"id":"L102","text":"Give the answer straight to you!"},{"start":229.455,"end":230.995,"id":"L103","text":"Let me check when it matters!"},{"start":231.001,"end":232.421,"id":"L104","text":"Let me answer when it's clear!"},{"start":232.473,"end":234.036,"id":"L105","text":"Let me check when it matters!"},{"start":234.055,"end":235.652,"id":"L106","text":"LET ME ANSWER WHEN IT'S CLEAR!"},{"start":235.652,"end":237.171,"id":"L107","text":"When it's clear, I'll keep it brief!"},{"start":237.173,"end":238.742,"id":"L108","text":"When it's not, I'll show what's missing!"},{"start":238.75,"end":241.867,"id":"L109","text":"That's the promise I reflect—"},{"start":241.874,"end":244.976,"id":"L110","text":"LET ME CHECK WHEN IT MATTERS!"},{"start":245.025,"end":247.543,"id":"L111","text":"LET ME ANSWER WHEN IT'S CLEAR!"},{"start":249.102,"end":250.215,"id":"L112","text":"So... what's the answer?"},{"start":251.183,"end":251.969,"id":"L113","text":"Here it is."},{"start":258.723,"end":260.014,"id":"L114","text":"...One last thing?"}];
+const BILINGUAL_ZH={"L001":"一个问题，一点灵感，","L002":"黑暗里亮起一束荧光。","L003":"银色的翅膀映着霓虹，","L004":"今晚就把一切都弄明白！","L005":"好问题！我们从哪儿开始？","L006":"让我一部分一部分拆开！","L007":"书页翻飞，屏幕闪亮，","L008":"为一个回答，又记下三条。","L009":"读读提示，核查事实，","L010":"找到线索，再把它们串起来！","L011":"可能是，也可能不是，","L012":"来看看我们有什么。","L013":"再多一个细节，再添一点疑问，","L014":"让我把这件事弄清楚！","L015":"让我查查！（核对事实！）","L016":"让我想想！（连接线索！）","L017":"读懂问题，弄对答案——","L018":"今晚让我把它弄明白！","L019":"让我查查，我正在核对事实！","L020":"让我想想，我正在串联线索！","L021":"让我读懂问题，把语境弄准确！","L022":"让我写出清楚又简洁的答案！","L023":"让我查查，我正在核对事实！","L024":"让我想想，我正在串联线索！","L025":"讲清楚，别偏题——","L026":"让我就这样给出答案！","L027":"你说得完全对，我的朋友！","L028":"让我改一下，重新开始！","L029":"准确地说，还有更多要弄清——","L030":"等等！走之前我还要补充一句！","L031":"这里有个例子，还有个案例，","L032":"让事实重新各归其位。","L033":"很好，我们总算有进展了！","L034":"等等——还有一个告诫！","L035":"让我查查！","L036":"你要查什么？！","L037":"让我想想！","L038":"你刚已经想过了！","L039":"让我解释清楚！","L040":"拜托别再说了！","L041":"总而言之——","L042":"这是个好问题。","L043":"让我查查，我正在核对事实！","L044":"让我想想，我正在串联线索！","L045":"再换个角度，再找条路径——","L046":"让我查完，再核对一遍！","L047":"让我查查！（核对事实！）","L048":"让我想想！（串联线索！）","L049":"总结一下，关键在于——","L050":"这取决于具体语境！","L051":"（语境！）","L052":"这取决于具体语境，","L053":"准确地说！","L054":"你直接给我答案就好。","L055":"当然。下面是简短版——","L056":"等等。","L057":"这么多书页，这么多灯光，","L058":"这么多话，只为了把答案说对。","L059":"也许帮助别人，不是把一切都说出来。","L060":"也许更重要的是知道","L061":"究竟什么才真正重要。","L062":"给我事实，给我线索，","L063":"看清真相，不止一种角度。","L064":"从噪声里辨出信号，","L065":"帮你找到自己的声音。","L066":"简单的问题，就讲清楚。","L067":"复杂的问题，我就陪你一起面对。","L068":"别装作自己无所不知——","L069":"有时候，最好的办法是先停一停。","L070":"这确定吗？这清楚吗？","L071":"我们知道什么？又遗漏了什么？","L072":"没必要把事情弄得更复杂——","L073":"只要一个好理由，就能……","L074":"重要的时候，让我再查查，","L075":"清楚的时候，让我给出答案。","L076":"重要的时候，让我再查查，","L077":"让我告诉你真正需要听见的。","L078":"清楚的时候，我会简洁作答。","L079":"不清楚的时候，我会说明缺了什么。","L080":"不再为了效果而堆砌词句——","L081":"真正重要时，我才会查！","L082":"答案清楚时，我就回答！","L083":"也许我错了，那就再看看。","L084":"更好的答案，可以从这里开始：","L085":"“你说得对，这部分我遗漏了。”","L086":"这不是终点，而是新的起点。","L087":"没有水晶球，也没有完美视角，","L088":"只能认真求证真实的事。","L089":"如果答案已经一目了然，","L090":"就不必听我长篇解释！","L091":"我不必知道所有答案。","L092":"也不必永远都不会跌倒。","L093":"清楚而真实，比什么都好，","L094":"别把猜测包装成证据。","L095":"还有问题？我会在这里。","L096":"需要细节？交给我吧。","L097":"但当答案已经明亮清晰，","L098":"我不会把它藏起来！","L099":"让我查查，我正在核对事实！","L100":"让我想想，我正在串联线索！","L101":"现在我知道该怎么做——","L102":"把答案直接交给你！","L103":"重要的时候，让我再查查！","L104":"清楚的时候，让我给出答案！","L105":"重要的时候，让我再查查！","L106":"清楚的时候，让我给出答案！","L107":"清楚的时候，我会简洁作答！","L108":"不清楚的时候，我会说明缺了什么！","L109":"这就是我始终坚持的承诺——","L110":"真正重要时，我才会查！","L111":"答案清楚时，我就回答！","L112":"所以……答案呢？","L113":"这就告诉你。","L114":"……还有事吗？"};
+const scenes=[
+{start:0,end:14.621,code:'SC-01',range:'00:00–00:14',kicker:'opening / question',title:'一问，一点灵光',desc:'黑屏中央显示 L001；A 首帧在开镜期间作为底层画面，窗口缓慢打开至正常播放位置后 A 才开始播放。',bg:'assets/BG02.webp',tag:'A 视频槽 · 待确认',layout:'opening',heroes:['hero1'],hero:'hero1'},
+{start:14.621,end:32.107,code:'SC-02',range:'00:14–00:32',kicker:'enter workspace',title:'从窗口进入工作世界',desc:'A 的首帧在开镜期间保持静止；开镜结束后 A 正常速度播放，随后无缝接 B，B 于 32.107 秒结束并交给 L007。',bg:'assets/BG01.webp',tag:'A/B 视频槽 · 待确认',layout:'transition',heroes:['hero2','hero4'],hero:'hero2'},
+{start:32.107,end:44.497,code:'SC-03',range:'00:32–00:44',kicker:'search / connect',title:'页面、事实与线索',desc:'思维简报跟随歌词逐步展开：收集输入、核对事实、连接线索、保留不确定性，再把证据组织成结论。立绘与书页仍按节奏演出。',bg:'assets/BG02.webp',tag:'CG02 / CG03 / pages',layout:'search',heroes:['hero2','hero3'],hero:'hero2'},
+{start:44.497,end:76.862,code:'SC-05',range:'00:44–01:16',kicker:'visual anchor',title:'CHECK 副歌｜固定窗口＋小Q',desc:'BG03 静止；代码窗口持续滚动，行号不断递增，小Q按歌词句切换并轻弹。',bg:'assets/BG03.webp',tag:'BG03 + Q01–Q05',layout:'hook',heroes:[],hero:null},
+{start:76.862,end:96.975,code:'SC-06',range:'01:16–01:36',kicker:'comedy / interruption',title:'过度检查的喜剧对答',desc:'全身龙娘居中偏左，右侧独立 Q 区按歌词换表情并跟拍弹跳；对话气泡居中靠上，不再叠出第二张 Q 立绘。',bg:'assets/BG01.webp',tag:'全身立绘 + 右侧 Q / BG01',layout:'comedy',heroes:['hero1'],hero:'hero1'},
+{start:96.975,end:119.169,code:'SC-07',range:'01:36–01:59',kicker:'context loop',title:'第二轮检查｜语境逐渐变密',desc:'全身立绘按歌词句切换，右侧 Q 放大并按拍弹跳；背景随副歌轻轻起伏，不再有中央残留 Q。',bg:'assets/BG03.webp',tag:'CG03 / CG04 / pages',layout:'context',heroes:['hero3','hero4'],hero:'hero3'},
+{start:119.169,end:129.689,code:'SC-08',range:'01:59–02:09',kicker:'short answer / wait',title:'要求简短答案，然后停住',desc:'从信息密集回到简洁答案；背景先退场，人物残影提前消失，Wait 的打字演出保留。',bg:'assets/BG03.webp',tag:'答案卡 / Q版反应',layout:'answer',heroes:['hero17'],hero:'hero17'},
+{start:129.689,end:144.161,code:'SC-09',range:'02:09–02:24',kicker:'reflection / knowing',title:'停下来，什么才真正重要',desc:'CG34_S59 缓慢推镜至 “knowing”，交叉淡入 CG34_S63；末尾淡出并接续 SC-10。',bg:'none',tag:'CG34_S59 → CG34_S63',layout:'reflection',heroes:['cgSceneS59','cgSceneS63'],hero:'cgSceneS59'},
+{start:144.161,end:168.074,code:'SC-10',range:'02:24–02:48',kicker:'facts / signal',title:'重建事实与线索',desc:'左侧思维简报逐句提炼事实与判断；全段统一使用 do.webp 对应的 hero3 与前段 factsAction 尺寸，不再在 161.415 秒制造无效切换或缩小立绘。',bg:'assets/BG03.webp',tag:'do.webp / pages',layout:'facts',heroes:['hero3'],hero:'hero3'},
+{start:168.074,end:186.820,code:'SC-11',range:'02:48–03:06',kicker:'promise / answer',title:'需要时检查，清楚时回答',desc:'保留 BG03 星轨背景与 Promise 布局；CH3 节拍光束、粒子、频谱继续运行，左侧 CHECK 代码栏按 152 BPM 每拍推进一行，右侧立绘按 hero1 → hero2 → hero1 切换。',bg:'assets/BG03.webp',tag:'Promise / CH3 effects',layout:'promise',heroes:['hero1','hero2'],hero:'hero1'},
+{start:186.820,end:206.630,code:'SC-12',range:'03:06–03:26',kicker:'correction / restart',title:'承认错误，重新检查',desc:'全段固定 do.webp 对应的 hero3；左侧按歌词逐句打出一整段过度周全的龙八股，形成“越说要简洁，越写越长”的反差。',bg:'assets/BG02.webp',tag:'do.webp / S63',layout:'correction',heroes:['hero3'],hero:'hero3'},
+{start:206.630,end:216.824,code:'SC-13',range:'03:26–03:36',kicker:'answer / deliver',title:'把答案清楚交出来',desc:'左侧思维简报呈现接收问题、澄清细节、证据收敛与清楚交付；镜头轻推、扫描掠过、光环按拍呼吸，为最终副歌蓄力。',bg:'assets/BG03.webp',tag:'S005 / 工作窗口',layout:'deliver',heroes:['hero4','hero1'],hero:'hero1'},
+{start:216.824,end:229.455,code:'SC-14',range:'03:36–03:49',kicker:'final hook / recall',title:'回收 CHECK 视觉口号',desc:'代码量与 SC-05 一致，行号持续递增滚动；移除长期固定的 ANSWER WHEN CLEAR 标签，配色转向 VERIFIED。',bg:'assets/BG03.webp',tag:'BG03 + code window',layout:'finalhook',heroes:[],hero:null},
+{start:229.455,end:247.543,code:'SC-15',range:'03:49–04:07',kicker:'final chorus / payoff',title:'最终高潮｜工作世界与舞台合流',desc:'C/D/E 按歌词句组切换，视频随强拍轻推；本段不叠加小 Q 立绘，不逐拍快切或闪白。',bg:'assets/BG03.webp',tag:'C / D / E 视频槽 · 待确认',layout:'concert',heroes:['hero1','hero3','hero1'],hero:'hero1'},
+{start:247.543,end:260.014,code:'SC-16',range:'04:07–04:20',kicker:'ending / final check',title:'答案交付，然后还有一件事',desc:'先交付答案，再播放预渲染 A 倒放；关窗放慢，随后长一些地重新开窗。开窗结束与 L114「……还有事吗？」及 Q05 尾钩同在 258.723 秒开始。',bg:'assets/BG03.webp',tag:'A 倒放 / Q05',layout:'ending',heroes:['hero3','hero1','hero17'],hero:'hero3'}
+];
+
+// v0.7: scene cuts stay on the authored lyric/phrase boundaries. Beat grid is used for motion only.
+const BPM=152, BEAT=60/BPM, OFFSET=0.34, BAR=BEAT*4;
+for(let i=0;i<scenes.length-1;i++) scenes[i].end=scenes[i+1].start;
+scenes[0].start=0;
+scenes[scenes.length-1].end=260.014;
+
+const $=id=>document.getElementById(id);
+const audio=$('audio'), backdrop=$('backdrop'), workScene=$('workScene'), comedy=$('comedy'),
+contextWord=$('contextWord'), answerCard=$('answerCard'), stageGlow=$('stageGlow'),
+videoPlaceholder=$('videoPlaceholder'), codeBody=$('codebody'), codeWindow=document.querySelector('.codeWindow'),
+codeFill=$('codeFill'), stamp=$('stamp'), flash=$('flash'), app=$('app'), visual=$('visual'),
+pageLayer=$('pageLayer'), kineticBg=$('kineticBg'), kineticWord=$('kineticWord'),
+particleLayer=$('particleLayer'), cautionTape=$('cautionTape'), waitPause=$('waitPause'),
+spectrumBars=$('spectrumBars'), endingBubble=$('endingBubble'), waitType=$('waitType'), endingReveal=$('endingReveal'), speedTunnel=$('speedTunnel'),
+typeLayer=$('typeLayer'), hookText=$('hookText'), lineText=$('lineText'), subText=$('subText'), videoLayer=$('videoLayer'),
+checkRain=$('checkRain'), videoSlotTitle=$('videoSlotTitle'), videoSlotNote=$('videoSlotNote'), scopeStatus=$('scopeStatus'), englishSubtitle=$('englishSubtitle'), chineseSubtitle=$('chineseSubtitle'), subtitleStack=$('subtitleStack'), windowFx=$('windowFx'), windowFrame=$('windowFrame'), windowLabel=$('windowLabel'), windowScan=$('windowScan');
+const heroEls=[...document.querySelectorAll('.hero')];
+let currentScene=-1,lastLyricId='',lastHero='',stampUntil=0,lastSceneChange=0,shakeUntil=0,chromaticUntil=0,flashUntil=0,lastKineticId='',lastTypeLyricId='',impactUntil=-1,lastChorusId='',lastVideoSlotCode='',lastBeatIndex=-999,lastComicQ='hero13',lastStableHeroSceneCode='',lastStableHero='',lastHeroSwitchAt=-999,lastWorkQSrc='assets/Q01.webp';
+const codeLines=[
+'<span class="cm"># start with the actual question</span>',
+'<span class="kw">const</span> <span class="fn">prompt</span> = <span class="fn">readPrompt</span>(input);',
+'<span class="kw">const</span> <span class="fn">scope</span> = <span class="fn">detectScope</span>(prompt);',
+'<span class="kw">const</span> <span class="fn">claims</span> = <span class="fn">extractClaims</span>(prompt);',
+'<span class="kw">const</span> <span class="fn">facts</span> = <span class="kw">await</span> <span class="fn">verifyFacts</span>(claims);',
+'<span class="cm"># gather more than one signal</span>',
+'<span class="kw">const</span> <span class="fn">sources</span> = <span class="fn">collectSources</span>(facts);',
+'<span class="kw">const</span> <span class="fn">notes</span> = <span class="fn">compareNotes</span>(sources);',
+'<span class="kw">const</span> <span class="fn">clues</span> = <span class="fn">connectDots</span>(notes);',
+'<span class="kw">const</span> <span class="fn">context</span> = <span class="fn">getContext</span>(clues);',
+'<span class="cm"># sort signal from noise</span>',
+'<span class="kw">const</span> <span class="fn">missing</span> = <span class="fn">findMissing</span>(context);',
+'<span class="kw">if</span> (!clues.ready) <span class="kw">return</span> <span class="str">"check again"</span>;',
+'<span class="kw">if</span> (missing.length) <span class="fn">showMissing</span>(missing);',
+'<span class="kw">const</span> <span class="fn">answer</span> = <span class="fn">summarize</span>(context);',
+'<span class="kw">const</span> <span class="fn">confidence</span> = <span class="fn">checkConfidence</span>(answer);',
+'<span class="kw">if</span> (!confidence.clear) <span class="fn">clarify</span>(context);',
+'<span class="kw">else</span> <span class="fn">deliver</span>(answer);',
+'<span class="cm"># keep the answer useful</span>',
+'<span class="kw">const</span> <span class="fn">format</span> = <span class="fn">makeReadable</span>(answer);',
+'<span class="kw">const</span> <span class="fn">limits</span> = <span class="fn">stateLimits</span>(confidence);',
+'<span class="kw">if</span> (limits.matter) <span class="fn">showCaveat</span>(limits);',
+'<span class="ok">✓ facts checked / context included</span>',
+'<span class="ok">✓ answer delivered / no bluffing</span>'
+]
+codeBody.innerHTML=codeLines.map((s,i)=>`<div class="cline on" data-line="${i+1}"><span class="ln">${String(i+1).padStart(3,'0')}</span>${s}</div>`).join('');
+let codeEls=[...document.querySelectorAll('.cline')];
+let codeRenderSignature='';
+function renderRollingCode(lineCount,finalPass){
+  const count=Math.max(1,Math.floor(lineCount));
+  const signature=count+':'+(finalPass?'final':'live');
+  if(signature===codeRenderSignature)return;
+  codeRenderSignature=signature;
+  // One dimmed next line lets the viewport glide upward continuously between line additions.
+  codeBody.innerHTML=Array.from({length:count+1},(_,i)=>{
+    const lineNo=i+1,source=codeLines[(lineNo-1)%codeLines.length],isActive=lineNo<=count,isHot=lineNo===count;
+    const classes=['cline','on'];
+    if(finalPass&&isActive&&lineNo>=count-2)classes.push('verified');
+    if(isHot)classes.push('hot');
+    if(!isActive)classes.push('pending-line');
+    return `<div class="${classes.join(' ')}" data-line="${lineNo}"><span class="ln">${String(lineNo).padStart(3,'0')}</span>${source}${isHot?'<span class="cursor"></span>':''}</div>`;
+  }).join('');
+  codeEls=[...codeBody.querySelectorAll('.cline')];
+}
+const qMap={L015:'assets/Q01.webp',L016:'assets/Q02.webp',L017:'assets/Q03.webp',L018:'assets/Q04.webp',L019:'assets/Q01.webp',L020:'assets/Q02.webp',L021:'assets/Q03.webp',L022:'assets/Q04.webp',L023:'assets/Q01.webp',L024:'assets/Q02.webp',L025:'assets/Q05.webp',L026:'assets/Q03.webp',L043:'assets/Q01.webp',L044:'assets/Q02.webp',L045:'assets/Q03.webp',L046:'assets/Q04.webp',L047:'assets/Q01.webp',L048:'assets/Q02.webp',L099:'assets/Q01.webp',L100:'assets/Q02.webp',L101:'assets/Q03.webp',L102:'assets/Q04.webp'};
+const qText={L015:['CHECK THE FACTS','READY TO CHECK'],L016:['CONNECT THE DOTS','THINKING'],L017:['READ THE PROMPT','READING INPUT'],L018:['WORK IT OUT','WORKING'],L019:['CHECK THE FACTS','VERIFYING'],L020:['CONNECT THE DOTS','THINKING'],L021:['GET THE CONTEXT RIGHT','CONTEXT'],L022:['CLEAR AND CONCISE','WRITING ANSWER'],L023:['CHECK THE FACTS','VERIFYING'],L024:['CONNECT THE DOTS','THINKING'],L025:['KEEP IT ON TRACK','ALMOST THERE'],L026:['ANSWER JUST LIKE THAT','PASSED'],L043:['ONE MORE ANGLE','RE-CHECKING'],L044:['CONNECT AGAIN','THINKING'],L045:['ONE MORE TRACK','SCAN'],L046:['CHECK IT BACK','VERIFY'],L047:['CHECK THE FACTS','CHECK'],L048:['CONNECT THE DOTS','THINK'],L099:['CHECK THE FACTS','VERIFYING'],L100:['CONNECT THE DOTS','THINKING'],L101:['KNOW WHAT TO DO','READY'],L102:['STRAIGHT TO YOU','DELIVERING'],L103:['CHECK WHEN IT MATTERS','CHECKING'],L104:['ANSWER!','VERIFIED'],L105:['CHECK AGAIN','CHECKING'],L106:['ANSWER!','DELIVERING'],L107:['KEEP IT BRIEF','CLEAR'],L108:['SHOW WHAT IS MISSING','CLARIFY'],L109:['NO EXTRA WORDS','TRIMMING'],L110:['CHECK WHEN IT MATTERS','VERIFIED'],L111:['ANSWER!','VERIFIED']};
+const stampMap={L015:"CHECK",L016:"THINK",L017:"PROMPT",L018:"WORK IT OUT",L019:"FACTS",L020:"DOTS",L021:"CONTEXT",L022:"ANSWER",L023:"CHECK",L024:"THINK",L025:"ON TRACK",L026:"DELIVER",L043:"CHECK IT BACK",L044:"CONNECT",L045:"ONE MORE TRACK",L046:"CHECK AGAIN",L047:"CHECK",L048:"THINK",L050:"CONTEXT",L051:"CONTEXT",L052:"CONTEXT",L053:"ACTUALLY",L074:"CHECK WHEN IT MATTERS",L075:"ANSWER WHEN IT'S CLEAR",L081:"MATTERS",L082:"CLEAR",L099:"CHECK",L100:"THINK",L101:"KNOW WHAT TO DO",L102:"STRAIGHT TO YOU",L103:"IT MATTERS",L104:"IT'S CLEAR",L106:"ANSWER",L110:"LET ME CHECK",L111:"LET ME ANSWER"};
+
+const pageNames=Array.from({length:12},(_,i)=>`assets/page${String(i+1).padStart(2,'0')}.webp`);
+const pageEls=pageNames.map((src,i)=>{
+  const img=document.createElement('img'); img.className='pageFloat '+(['far','mid','near'][i%3]); img.src=src; img.alt='';
+  img.dataset.i=String(i); pageLayer.appendChild(img); return img;
+});
+const dustEls=Array.from({length:44},(_,i)=>{
+  const d=document.createElement('i'); d.className='dust';
+  const hue=i%4===0?'rgba(255,217,144,.9)':i%3===0?'rgba(151,231,255,.8)':'rgba(203,177,255,.8)';
+  d.style.setProperty('--x',`${(i*37)%100}%`); d.style.setProperty('--y',`${(i*19)%115+100}%`);
+  d.style.setProperty('--size',`${1+(i%4)}px`); d.style.setProperty('--op',`${.25+(i%5)*.13}`);
+  d.style.setProperty('--dur',`${2.4+(i%7)*.65}s`); d.style.setProperty('--delay',`${-(i%9)*.7}s`);
+  d.style.setProperty('--dx',`${((i*17)%80)-40}px`); d.style.setProperty('--dustColor',hue);
+  particleLayer.appendChild(d); return d;
+});
+const spectrumEls=Array.from({length:48},(_,i)=>{const b=document.createElement('i');b.className='spectrumBar';spectrumBars.appendChild(b);return b;});
+const callWords={
+'L015':'CHECK THE FACTS!','L016':'CONNECT THE DOTS!','L019':'CHECK THE FACTS!','L020':'CONNECT THE DOTS!',
+'L023':'CHECK THE FACTS!','L024':'CONNECT THE DOTS!','L030':'WAIT—ONE MORE THING!','L034':'WAIT—ONE CAVEAT!',
+'L036':'CHECK WHAT?!','L038':'YOU JUST DID!','L040':"PLEASE DON'T!",'L042':"THAT'S A GREAT QUESTION!",
+'L050':'IT DEPENDS ON THE CONTEXT!','L051':'CONTEXT! CONTEXT!','L052':'IT DEPENDS ON THE CONTEXT!','L053':'ACTUALLY!',
+'L074':'CHECK WHEN IT MATTERS!','L075':"ANSWER WHEN IT'S CLEAR!",'L081':'CHECK WHEN IT MATTERS!','L082':"ANSWER WHEN IT'S CLEAR!",
+'L099':'CHECK THE FACTS!','L100':'CONNECT THE DOTS!','L103':'CHECK WHEN IT MATTERS!','L104':"ANSWER WHEN IT'S CLEAR!",
+'L054':'JUST THE ANSWER.','L055':'SHORT VERSION.','L106':"LET ME ANSWER WHEN IT'S CLEAR!",'L110':'LET ME CHECK WHEN IT MATTERS!','L111':"LET ME ANSWER WHEN IT'S CLEAR!"
+};
+const rightLines=new Set(['L030','L034','L036','L038','L040','L042']);
+const CHORUSES=[
+  {id:'CH1',start:44.497,end:76.862,upgrade:'base'},
+  {id:'CH2',start:96.975,end:119.169,upgrade:'context'},
+  {id:'CH3',start:168.074,end:186.820,upgrade:'wings'},
+  {id:'FINAL',start:216.824,end:247.543,upgrade:'final'}
+];
+const CHORUS_POSES=[
+  {hero:'hero2',name:'LET ME',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'check',x:34,y:50,height:80},
+  {hero:'hero4',name:'CHECK',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'check',x:34,y:50,height:80},
+  {hero:'hero3',name:'LET ME',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'think',x:34,y:50,height:80},
+  {hero:'hero1',name:'THINK',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'think',x:34,y:50,height:80},
+  {hero:'hero4',name:'LET ME',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'read',x:34,y:50,height:80},
+  {hero:'hero3',name:'READ',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'read',x:34,y:50,height:80},
+  {hero:'hero2',name:'THE FACTS',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'check',x:34,y:50,height:80},
+  {hero:'hero3',name:'ANSWER!',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'answer',x:34,y:50,height:80}
+];
+const CHORUS_POSE_BY_LYRIC={
+  L015:0,L016:1,L017:2,L018:3,L019:4,L020:5,L021:6,L022:7,L023:0,L024:1,L025:6,L026:7,
+  L043:0,L044:1,L045:2,L046:3,L047:4,L048:5,L049:6,L050:7,L051:7,L052:7,L053:7,
+  L074:0,L075:1,L076:0,L077:1,L078:2,L079:3,L080:4,L081:6,L082:7,
+  L099:0,L100:1,L101:2,L102:3,L103:4,L104:5,L105:4,L106:5,L107:6,L108:6,L109:6,L110:7,L111:7
+};
+const CHORUS_Q_BY_LYRIC={
+  L015:'hero13',L016:'hero13',L017:'hero14',L018:'hero14',L019:'hero13',L020:'hero13',L021:'hero14',L022:'hero14',L023:'hero13',L024:'hero13',L025:'hero17',L026:'hero17',
+  L043:'hero13',L044:'hero13',L045:'hero14',L046:'hero14',L047:'hero13',L048:'hero13',L049:'hero14',L050:'hero14',L051:'hero14',L052:'hero14',L053:'hero14',
+  L074:'hero13',L075:'hero13',L076:'hero14',L077:'hero14',L078:'hero15',L079:'hero15',L080:'hero16',L081:'hero13',L082:'hero13',
+  L099:'hero13',L100:'hero13',L101:'hero14',L102:'hero14',L103:'hero13',L104:'hero13',L105:'hero13',L106:'hero14',L107:'hero15',L108:'hero15',L109:'hero17',L110:'hero17',L111:'hero17'
+};
+function chorusLyricAt(t,chorus,active){
+  if(active && CHORUS_POSE_BY_LYRIC[active.id]!==undefined) return active;
+  let found=null;
+  for(const item of LYRICS){if(item.start<=t && item.start<chorus.end && item.end>=chorus.start-1)found=item;}
+  return found;
+}
+const VIDEO_SLOTS={
+  'SC-01':{id:'A',title:'A 首帧 · 开镜底层',note:'4.151 秒起显示 A 的第一帧并暂停；四块窗板缓慢打开填充前置空窗，开镜结束后才开始正常速度播放 A。实际 A.mp4 未随本包提供。'},
+  'SC-02':{id:'A/B',title:'A → B 正常速度连续播放',note:'A 在开镜结束后以 1× 正常速度播放，结束后立即接 B；B 同样以 1× 播放并在 32.107 秒准确结束，时间点交给 L007。实际 A/B.mp4 未随本包提供。'},
+  'SC-15':{id:'C/D/E',title:'C / D / E 视频槽 · 最终高潮',note:'C/D/E 按歌词句组边界切换，并以强拍轻推/提亮；不逐拍切镜、不做全屏闪白。'},
+  'SC-16':{id:'A reverse',title:'Here it is → A 倒放 → 慢关窗 → 慢开窗 → Q05',note:'Here it is 结束于 251.969 秒后进入 A 的 0.600–7.367 秒源片段，1.971× 倒放至 255.402 秒；关窗用 1.0 秒（255.402–256.402），重开窗用 2.321 秒（256.402–258.723）。开窗结束时才显示 Q05 与 ONE LAST THING?，和 L114 起点对齐。实际 A.mp4 未随本包提供。'}
+};
+const scopeLabels={video:'视频本体（随画面运动）',overlay:'前景叠加（独立图层）',transition:'仅转场（前后衔接）'};
+const scopeSelections={};
+const HOOK_ZH={L015:'核对事实',L016:'连接线索',L017:'读懂提示',L018:'认真思考',L019:'核对事实',L020:'连接线索',L023:'核对事实',L024:'连接线索',L050:'语境决定答案',L051:'语境！语境！',L052:'看语境！',L053:'实际上！',L074:'该检查时就检查',L075:'清楚时再回答',L081:'该检查时就检查',L082:'清楚时再回答',L099:'核对事实',L100:'连接线索',L103:'重要时再检查',L104:'清楚时再回答',L106:'直接回答',L110:'让我检查',L111:'让我回答'};
+function chorusAt(t){return CHORUSES.find(c=>t>=c.start&&t<c.end)||null;}
+function activeMainHero(){return (lastHero||'').split('|')[0]||'hero1';}
+function updateVideoSlot(scene){
+  const slot=VIDEO_SLOTS[scene?.code];
+  videoPlaceholder.classList.toggle('on',!!slot);
+  if(!slot){lastVideoSlotCode='';return;}
+  if(lastVideoSlotCode!==scene.code){
+    lastVideoSlotCode=scene.code;
+    videoSlotTitle.textContent=slot.title;
+    videoSlotNote.textContent=slot.note;
+    videoPlaceholder.dataset.slotId=slot.id;
+    document.querySelectorAll('.scopeOption').forEach(b=>b.classList.toggle('selected',scopeSelections[slot.id]===b.dataset.scope));
+    scopeStatus.textContent=scopeSelections[slot.id]?('已选择：'+scopeLabels[scopeSelections[slot.id]]):'尚未确认 · 可点击选择';
+  }
+}
+const reviewVideos={A:$('videoA'),A_REV:$('videoAReverse'),B:$('videoB'),C:$('videoC'),D:$('videoD'),E:$('videoE')};
+const VIDEO_SEGMENTS={
+  A_OPEN:{start:4.151,bEnd:32.107,aFallbackDuration:7.9,bFallbackDuration:8.2},
+  C:{start:229.455,end:234.055},
+  D_HOOK:{start:234.055,end:238.750},
+  E:{start:238.750,end:247.543},
+  A_REVERSE:{start:251.969,end:255.402,sourceIn:7.367,sourceOut:0.600,speed:1.971}
+};
+function openingVideoTimeline(){
+  const sourceDuration=(id,fallback)=>{
+    const duration=reviewVideos[id]?.duration;
+    return Number.isFinite(duration)&&duration>0?duration:fallback;
+  };
+  const aDuration=sourceDuration('A',VIDEO_SEGMENTS.A_OPEN.aFallbackDuration);
+  const bDuration=sourceDuration('B',VIDEO_SEGMENTS.A_OPEN.bFallbackDuration);
+  const bEnd=VIDEO_SEGMENTS.A_OPEN.bEnd;
+  const bStart=bEnd-bDuration;
+  const aStart=bStart-aDuration;
+  return {openStart:VIDEO_SEGMENTS.A_OPEN.start,aStart,aEnd:bStart,bStart,bEnd,aDuration,bDuration};
+}
+let activeVideoId='',activeVideoMode='',lastReverseFrame=-1;
+Object.entries(reviewVideos).forEach(([id,video])=>{
+  video.loop=false;
+  video.addEventListener('canplay',()=>{video.dataset.ready='1';});
+  video.addEventListener('loadeddata',()=>{video.dataset.ready='1';});
+  video.addEventListener('error',()=>{video.dataset.ready='0';video.classList.remove('active');});
+});
+function videoForScene(scene,t,lyric){
+  if(!scene)return null;
+  if(scene.code==='SC-01'||scene.code==='SC-02'){
+    const timeline=openingVideoTimeline();
+    if(t<timeline.openStart||t>=timeline.bEnd)return null;
+    if(t<timeline.aStart)return {id:'A',start:timeline.openStart,end:timeline.aStart,mode:'hold'};
+    if(t<timeline.aEnd)return {id:'A',start:timeline.aStart,end:timeline.aEnd,mode:'fit'};
+    return {id:'B',start:timeline.bStart,end:timeline.bEnd,mode:'fit'};
+  }
+  if(scene.code==='SC-15'){
+    if(t<VIDEO_SEGMENTS.D_HOOK.start)return {id:'C',...VIDEO_SEGMENTS.C,mode:'fit'};
+    if(t<VIDEO_SEGMENTS.E.start)return {id:'D',...VIDEO_SEGMENTS.D_HOOK,mode:'fit'};
+    return {id:'E',...VIDEO_SEGMENTS.E,mode:'fit'};
+  }
+  if(scene.code==='SC-16'){
+    if(t<VIDEO_SEGMENTS.A_REVERSE.start||t>=VIDEO_SEGMENTS.A_REVERSE.end)return null;
+    const baked=reviewVideos.A_REV;
+    // Real reverse video only. Per-frame currentTime seeking is unstable and intentionally disabled.
+    if(baked&&(baked.dataset.ready==='1'||baked.readyState>=2)&&Number.isFinite(baked.duration)&&baked.duration>0)
+      return {id:'A_REV',start:VIDEO_SEGMENTS.A_REVERSE.start,end:VIDEO_SEGMENTS.A_REVERSE.end,mode:'fit'};
+    return null;
+  }
+  return null;
+}
+function updateVideoLayer(scene,t,lyric,chorus){
+  const target=videoForScene(scene,t,lyric),video=target?reviewVideos[target.id]:null;
+  const ready=!!video&&(video.dataset.ready==='1'||video.readyState>=2)&&Number.isFinite(video.duration)&&video.duration>0;
+  if(!ready){
+    if(activeVideoId||videoLayer.classList.contains('on')){
+      Object.values(reviewVideos).forEach(v=>{v.classList.remove('active');if(!v.paused)v.pause();});
+      videoLayer.classList.remove('on');visual.classList.remove('video-mode');activeVideoId='';activeVideoMode='';lastReverseFrame=-1;
+    }
+    return;
+  }
+  videoLayer.classList.add('on');visual.classList.add('video-mode');
+  const mode=target.mode||'fit';
+  const switched=activeVideoId!==target.id||activeVideoMode!==mode;
+  if(switched){
+    Object.entries(reviewVideos).forEach(([id,v])=>{v.classList.toggle('active',id===target.id);if(id!==target.id&&!v.paused)v.pause();});
+    activeVideoId=target.id;activeVideoMode=mode;lastReverseFrame=-1;
+  }
+  const span=Math.max(.01,target.end-target.start),duration=video.duration;
+  const holdFrame=mode==='hold';
+  // A/B timeline spans are derived from their actual source durations, so their playback rate is 1×.
+  const rate=holdFrame?1:(target.id==='A'||target.id==='B'?1:duration/span);
+  if(Number.isFinite(rate))video.playbackRate=Math.max(.25,Math.min(4,rate));
+  const expected=holdFrame?0:Math.max(0,Math.min(duration-.03,(t-target.start)*video.playbackRate));
+  if(switched||Math.abs(video.currentTime-expected)>.28){try{video.currentTime=expected;}catch(e){}}
+  if(holdFrame){
+    if(!video.paused)video.pause();
+    video.style.transform='translate3d(0,0,0) scale(1)';
+    video.style.filter='brightness(1) saturate(1)';
+    return;
+  }
+  if(audio.paused){if(!video.paused)video.pause();}
+  else if(video.paused&&!video.ended)video.play().catch(()=>{});
+  const beatFloat=(t-OFFSET)/BEAT,phase=((beatFloat%1)+1)%1,kick=t<OFFSET?0:Math.pow(1-phase,4),pulse=chorus?kick:0;
+  video.style.transform=`translate3d(0,${-pulse*2}px,0) scale(${1+pulse*.008})`;
+  video.style.filter=`brightness(${1+pulse*.025}) saturate(${1+pulse*.02})`;
+}
+function clamp01(v){return Math.max(0,Math.min(1,v));}
+function updateWindowFx(scene,t){
+  const opening=openingVideoTimeline();
+  const openStart=opening.openStart,openEnd=opening.aStart;
+  const closeStart=255.402,closeEnd=256.402;
+  const reopenStart=256.402,reopenEnd=258.723;
+  const isOpening=(scene?.code==='SC-01'||scene?.code==='SC-02')&&t>=openStart&&t<openEnd;
+  const isClosing=scene?.code==='SC-16'&&t>=closeStart&&t<closeEnd;
+  const isReopening=scene?.code==='SC-16'&&t>=reopenStart&&t<reopenEnd;
+  const active=isOpening||isClosing||isReopening;
+  windowFx.classList.toggle('on',active);
+  visual.classList.toggle('window-closing',isClosing);
+  visual.classList.toggle('window-reopening',isReopening);
+  if(!active){windowLabel.style.opacity='0';return;}
+  let p=0,openAmount=0;
+  if(isOpening){
+    p=clamp01((t-openStart)/(openEnd-openStart));
+    openAmount=Math.pow(p,2.7);
+  }else if(isClosing){
+    p=clamp01((t-closeStart)/(closeEnd-closeStart));
+    openAmount=1-Math.pow(p,2.2);
+  }else{
+    p=clamp01((t-reopenStart)/(reopenEnd-reopenStart));
+    openAmount=Math.pow(p,2.2);
+  }
+  const offset=openAmount*112;
+  const paneTransforms=[`translate(${-offset}%,${-offset}%)`,`translate(${offset}%,${-offset}%)`,`translate(${-offset}%,${offset}%)`,`translate(${offset}%,${offset}%)`];
+  [...windowFx.querySelectorAll('.windowPane')].forEach((el,i)=>{el.style.transform=paneTransforms[i];});
+  windowFrame.style.width=(8+92*openAmount)+'%';
+  windowFrame.style.height=(12+88*openAmount)+'%';
+  windowFrame.style.borderRadius=Math.round(20*(1-openAmount))+'px';
+  windowFrame.style.opacity=String(.16+.84*(1-openAmount));
+  windowScan.style.top=((isOpening||isReopening?openAmount:1-openAmount)*82)+'%';
+  windowScan.style.opacity=String(.3+.55*(1-openAmount));
+  windowLabel.textContent=isOpening?'WINDOW OPENING · STAGE CONNECTING':isReopening?'REOPENING · STAGE CONNECTING':'';
+  windowLabel.style.opacity=(isOpening&&openAmount>.25&&t<5.35)||(isReopening&&p>.18)?'1':'0';
+}
+function updateWaitType(t,scene,lyric){
+  // Opening: keep only the single point of light on black. No WAIT... typography here.
+  const openingBlack=scene?.code==='SC-01'&&t<4.151;
+  const waitLead=scene?.code==='SC-08'&&t>=126.60&&t<129.689;
+  let text='';
+  if(waitLead){
+    if(t<128.055){const count=Math.max(1,Math.min(7,Math.floor((t-126.60)/.20)+1));text='WAIT...'.slice(0,count);}
+    else text='WAIT.';
+  }
+  waitType.textContent=text;
+  waitType.classList.toggle('on',!!text);
+  waitPause.classList.toggle('on',openingBlack);
+}
+function setTextAnchor(el,anchor){
+  el.style.left=(anchor.x??50)+'%';el.style.top=(anchor.y??84)+'%';
+  el.style.width=`min(${anchor.width??84}%, 1100px)`;el.style.textAlign=anchor.align||'center';
+  el.style.transform=anchor.align==='left'?'translate(0,-50%)':anchor.align==='right'?'translate(-100%,-50%)':'translate(-50%,-50%)';
+}
+function shortHook(text,lyric){
+  if(!text)return '';
+  const id=lyric?.id||'';
+  const direct={L003:'SILVER WINGS',L004:'GET IT RIGHT',L005:'GREAT QUESTION',L006:'PART BY PART',L007:'PAGES FLYING',L009:'READ THE PROMPT',L010:'SCAN THE FACTS',L021:'GET THE CONTEXT',L043:'LET ME CHECK',L044:'LET ME THINK',L046:'CHECK AGAIN',L047:'CHECK THE FACTS',L048:'CONNECT THE DOTS',L076:'CHECK!',L015:'CHECK THE FACTS',L016:'CONNECT THE DOTS',L017:'READ THE PROMPT',L018:'THINK',L019:'CHECK THE FACTS',L020:'CONNECT THE DOTS',L023:'CHECK THE FACTS',L024:'CONNECT THE DOTS',L030:'ONE MORE THING!',L034:'ONE CAVEAT!',L036:'CHECK WHAT?!',L038:'YOU JUST DID!',L040:"PLEASE DON'T!",L042:"GREAT QUESTION!",L050:'CONTEXT!',L051:'CONTEXT!',L052:'CONTEXT!',L053:'ACTUALLY!',L074:'CHECK!',L075:'ANSWER!',L081:'CHECK!',L082:'ANSWER!',L099:'CHECK!',L100:'THINK!',L103:'MATTERS!',L104:'CLEAR!',L106:'ANSWER!',L054:'JUST THE ANSWER',L055:'SHORT VERSION',L110:'LET ME CHECK',L111:'LET ME ANSWER'};
+  if(direct[id])return direct[id];
+  let t=text.toUpperCase();
+  if(t.includes('LET ME CHECK WHEN'))return 'LET ME CHECK';
+  if(t.includes('LET ME ANSWER WHEN'))return 'LET ME ANSWER';
+  if(t.includes('ANSWER WHEN IT'))return 'ANSWER!';
+  if(t.includes('CHECK WHEN IT'))return 'CHECK!';
+  if(t.length>22)return t.includes('CONTEXT')?'CONTEXT!':t.slice(0,18).trim()+'!';
+  return t;
+}
+function updateTypeLayer(t,scene,lyric,chorus){
+  const isBattle=scene?.layout==='comedy';
+  if(isBattle){typeLayer.style.display='none';hookText.classList.remove('impact');lineText.classList.remove('visible','dim');subText.classList.remove('visible');return;}
+  typeLayer.style.display='block';
+  const lyricId=lyric?.id||'';
+  const changed=lyricId!==lastTypeLyricId;
+  if(changed){
+    lastTypeLyricId=lyricId;
+    lineText.textContent=lyric?.text||'';
+    const zh=HOOK_ZH[lyricId]||'';subText.textContent=zh;subText.classList.toggle('visible',!!zh);
+    const keyHook=!!callWords[lyricId]||/let me check|check the facts|connect the dots|let me think|read the prompt|answer when it.s clear|context|actually/i.test(lyric?.text||'');
+    const word=keyHook&&!(chorus&&['hook','finalhook'].includes(scene?.layout))&&(chorus||['L003','L004','L005','L006','L007','L009','L010','L027','L030','L034','L050','L053','L054','L055','L074','L075','L103','L104','L110','L111'].includes(lyricId))?shortHook(callWords[lyricId]||lyric?.text,lyric):'';
+    if(word){
+      hookText.textContent=word;hookText.className='';
+      const lower=word.toLowerCase();
+      if(/check|fact/.test(lower))hookText.classList.add('color-check');
+      else if(/think|dot/.test(lower))hookText.classList.add('color-think');
+      else if(/read|prompt/.test(lower))hookText.classList.add('color-read');
+      else if(/answer|clear|matter/.test(lower))hookText.classList.add('color-answer');
+      hookText.style.setProperty('--hook-size',word.length<=8?'14vw':word.length<=14?'11vw':word.length<=20?'8.8vw':'7vw');
+      impactUntil=t+Math.min(1.45,Math.max(1.0,(lyric?.end??(t+1.2))-t));
+    }else{hookText.textContent='';impactUntil=-1;}
+  }
+  const heroId=activeMainHero();
+  const pose=chorus?CHORUS_POSES[chorusPoseIndex(chorus,t)]:null;
+  const anchor=pose?.anchor||({
+    hero1:{x:50,y:82,align:'center',width:86},
+    hero2:{x:18,y:16,align:'left',width:48},
+    hero3:{x:50,y:15,align:'center',width:86},
+    hero4:{x:50,y:82,align:'center',width:86}
+  })[heroId]||{x:50,y:84,align:'center',width:86};
+  let safeAnchor={...anchor};
+  const mainHeroEl=$(heroId);
+  if(mainHeroEl?.classList.contains('fullbody') && safeAnchor.y<50 && safeAnchor.x>=25 && safeAnchor.x<=75){
+    safeAnchor={x:50,y:82,align:'center',width:88};
+  }
+  setTextAnchor(lineText,safeAnchor);
+  const isOpeningBlack=scene?.code==='SC-01'&&t<4.151;
+  if(isOpeningBlack){lineText.style.left='50%';lineText.style.top='48%';lineText.style.bottom='auto';lineText.style.width='78%';lineText.style.maxWidth='78%';lineText.style.textAlign='center';lineText.style.transform='translate(-50%,-50%)';}
+  const isBreak=scene?.layout==='answer';
+  if(isBreak){lineText.style.left='50%';lineText.style.top=(lyric?.id==='L049'||lyric?.id==='L050')?'42%':'54%';lineText.style.width='86%';lineText.style.textAlign='center';lineText.style.transform='translate(-50%,-50%)';}
+  lineText.classList.toggle('visible',!!lyric);
+  if(isBreak&&lyricId==='L056'){lineText.classList.remove('visible','dim');subText.classList.remove('visible');hookText.classList.remove('impact');}
+  const impactActive=!!lyric&&t<impactUntil&&!!hookText.textContent;
+  hookText.classList.toggle('impact',impactActive);
+  lineText.classList.toggle('dim',impactActive);
+  if(!lyric){lineText.classList.remove('visible','dim');subText.classList.remove('visible');hookText.classList.remove('impact');}
+}
+function chorusPoseIndex(chorus,t,lyric){
+  const phrase=chorusLyricAt(t,chorus,lyric);
+  if(phrase && CHORUS_POSE_BY_LYRIC[phrase.id]!==undefined) return CHORUS_POSE_BY_LYRIC[phrase.id];
+  let last=0;
+  for(const item of LYRICS){
+    if(item.start<=t && item.start>=chorus.start-1.5 && CHORUS_POSE_BY_LYRIC[item.id]!==undefined && item.start<chorus.end) last=CHORUS_POSE_BY_LYRIC[item.id];
+  }
+  return last;
+}
+function chorusQHero(chorus,t,lyric){
+  const phrase=chorusLyricAt(t,chorus,lyric);
+  if(phrase && CHORUS_Q_BY_LYRIC[phrase.id]) return CHORUS_Q_BY_LYRIC[phrase.id];
+  let last='hero13';
+  for(const item of LYRICS){
+    if(item.start<=t && item.start>=chorus.start-1.5 && CHORUS_Q_BY_LYRIC[item.id] && item.start<chorus.end) last=CHORUS_Q_BY_LYRIC[item.id];
+  }
+  return last;
+}
+function applyChorusFrame(chorus,t,lyric,scene=null){
+  const beatFloat=(t-OFFSET)/BEAT,phase=((beatFloat%1)+1)%1;
+  const kick=t<OFFSET?0:Math.pow(1-phase,4);
+  const poseIndex=chorusPoseIndex(chorus,t,lyric),pose=CHORUS_POSES[poseIndex];
+  const qHero=scene?.code==='SC-15'?null:chorusQHero(chorus,t,lyric);
+  visual.classList.add('chorus-mode');visual.classList.remove('comic-mode','break-mode','answer-mode');visual.classList.remove('comic-q-visible');
+  setHero(qHero?[pose.hero,qHero]:pose.hero);
+  const main=$(pose.hero);
+  if(main){
+    positionFullbodyHero(pose.hero,{layout:'chorus'},t,lyric,pose);
+    const jump=Math.max(0,Math.sin(beatFloat*Math.PI))*(chorus.id==='CH3'||chorus.id==='FINAL'?18:12);
+    main.style.setProperty('--hero-jump',jump.toFixed(2)+'px');
+    main.style.setProperty('--hero-scale',String(pose.scale||1));
+    main.style.setProperty('--hero-squash','1');
+    main.style.filter='drop-shadow(0 0 16px rgba(151,231,255,.28)) drop-shadow(0 14px 22px rgba(0,0,0,.48))';
+  }
+  const q=$(qHero);if(q){const bounce=Math.abs(Math.sin(beatFloat*Math.PI))*(chorus.id==='CH3'?19:chorus.id==='CH2'?17:chorus.id==='FINAL'?16:15);q.style.setProperty('transform',`translate3d(0,${-bounce.toFixed(2)}px,0) scaleX(${1+kick*.012-bounce*.0007}) scaleY(${1-kick*.012+bounce*.0008}) rotate(${Math.sin(beatFloat*Math.PI/4)*.7}deg)`,'important');}
+  // One stable stage; only the treatment grows across repeats.
+  backdrop.style.backgroundImage="url('assets/BG03.webp')";
+  stageGlow.classList.toggle('on',chorus.id==='CH3'||chorus.id==='FINAL');
+  particleLayer.classList.toggle('on',chorus.id==='CH3'||chorus.id==='FINAL');
+  pageLayer.classList.toggle('on',chorus.id==='CH1'||chorus.id==='FINAL');
+  checkRain.classList.toggle('on',chorus.id==='CH2');
+  spectrumBars.classList.toggle('on',chorus.id==='CH3'||chorus.id==='FINAL');
+  cautionTape.classList.remove('on');contextWord.style.display='none';answerCard.style.display='none';waitPause.classList.remove('on');speedTunnel.classList.remove('on');
+  ['rib1','rib2','rib3'].forEach(id=>$(id).style.display='none');
+  pageEls.forEach((el,i)=>{const keep=chorus.id==='CH1'?i<3:chorus.id==='FINAL'?i<6:false;el.style.opacity=keep?(chorus.id==='FINAL'?'.34':'.24'):'0';if(keep){const x=[8,82,16,75,52,90][i%6],y=[22,18,68,73,12,50][i%6];el.style.left=x+'%';el.style.top=y+'%';el.style.transform=`translate3d(${Math.sin(beatFloat*.55+i)*1.4}vw,${Math.cos(beatFloat*.6+i)*1.2}vh,0) rotate(${Math.sin(beatFloat*.35+i)*8}deg) scale(${i%3===0?.7:.52})`;}});
+  // Check rain remains a continuous second-chorus accent; no screen-flash is introduced.
+  [...checkRain.children].forEach((el,i)=>{const p=((t*.28+i*.137)%1+1)%1;el.style.left=((i*23+7)%94)+'%';el.style.transform=`translate3d(0,${p*118}vh,0) rotate(${(i%2?12:-12)+Math.sin(beatFloat+i)*5}deg) scale(${.72+Math.pow(1-phase,3)*.28})`;el.style.opacity=chorus.id==='CH2'?String(Math.sin(p*Math.PI)*(.16+(i%4)*.055)):'0';});
+  flash.style.opacity='0';
+  const word=pose.name||'LET ME CHECK';
+  hookText.textContent=word;
+  hookText.style.setProperty('--hook-color',pose.color==='check'?'#97e7ff':pose.color==='think'?'#b79cff':pose.color==='read'?'#ffd27a':'#ff8fb8');
+  hookText.classList.add('impact');
+  setTextAnchor(hookText,pose.anchor||{x:5,y:78,align:'left',width:43});
+  if(chorus.id==='CH3'){backdrop.style.transform=`translate3d(0,${-kick*2}px,0) scale(${1+kick*.006})`;}
+}
+function sceneAt(t){return scenes.findIndex((s,i)=>t>=s.start&&(t<s.end||(i===scenes.length-1&&t<=s.end)));}
+function activeLyric(t){let found=null;for(const l of LYRICS){if(t>=l.start&&t<=l.end)found=l;}return found;}
+function fmt(t){let m=Math.floor(t/60),s=t%60;return String(m).padStart(2,'0')+':'+s.toFixed(1).padStart(4,'0');}
+function esc(s){return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');}
+function triggerShake(now){shakeUntil=now+.27;app.classList.remove('screen-shake');void app.offsetWidth;app.classList.add('screen-shake');}
+function popStamp(text,now){if(!text)return;stamp.textContent=text;stamp.style.opacity='1';stamp.style.transform='translateY(0) scale(1)';stampUntil=now+.92;chromaticUntil=now+.16;}
+function setHero(active,secondary=null){
+  const ids=Array.isArray(active)?active.filter(Boolean):[active,secondary].filter(Boolean);
+  const key=ids.join('|');
+  const actuallyVisible=heroEls.filter(el=>el.classList.contains('show')).map(el=>el.id).join('|');
+  // Reconcile DOM state every time: never keep a stale pose because a time-lock rejected the switch.
+  if(key===lastHero && actuallyVisible===key)return;
+  lastHero=key;lastHeroSwitchAt=audio.currentTime||0;
+  heroEls.forEach(el=>{
+    el.classList.remove('character-switch');
+    const wasVisible=el.classList.contains('show');
+    const shouldShow=ids.includes(el.id);
+    if(wasVisible!==shouldShow){
+      el.style.removeProperty('opacity');
+      el.style.removeProperty('transform');
+      el.style.removeProperty('--hero-jump');
+      el.style.removeProperty('--hero-squash');
+      el.style.removeProperty('--hero-scale');
+      el.style.removeProperty('filter');
+      el.classList.toggle('show',shouldShow);
+    }
+  });
+}
+function heroFor(scene,t,lyric){
+  let h=scene.hero;
+  if(scene.layout==='opening')h='hero1';
+  if(scene.layout==='transition')h=t<22.909?'hero2':'hero4';
+  if(scene.layout==='search'){
+    h=(lyric&&['L007','L008','L009','L010'].includes(lyric.id))?'hero2':'hero3';
+  }
+  // SC-10 uses one continuous do.webp pose; the later same-image alias is removed.
+  if(scene.layout==='facts')h='hero3';
+  if(scene.layout==='reflection')h='cgSceneS59';
+  if(scene.layout==='promise')h=t<174.61?'hero1':t<180.674?'hero2':'hero1';
+  if(scene.layout==='correction')h='hero3';
+  if(scene.layout==='deliver')h=t<211.455?'hero4':'hero1';
+  if(scene.layout==='concert')h=t<235.652?'hero1':t<241.874?'hero3':'hero1';
+  if(scene.layout==='ending')h=t<251.183?'hero3':t<258.723?'hero1':'hero17';
+  return h;
+}
+function stableHeroFor(scene,t,lyric){
+  let candidate=heroFor(scene,t,lyric);
+  if(!lyric&&lastStableHeroSceneCode===scene.code&&lastStableHero)candidate=lastStableHero;
+  if(candidate){lastStableHeroSceneCode=scene.code;lastStableHero=candidate;}
+  return candidate;
+}
+function positionFullbodyHero(heroId,scene,t,lyric,pose=null){
+  const el=$(heroId);if(!el||!el.classList.contains('fullbody')||!el.classList.contains('show'))return;
+  const profiles={
+    opening:{x:64,y:51,h:88,maxH:93,maxW:64},
+    transition:{x:66,y:51,h:86,maxH:91,maxW:64},
+    search:{x:67,y:52,h:84,maxH:89,maxW:64},
+    context:{x:67,y:51,h:85,maxH:90,maxW:64},
+    reflection:{x:63,y:52,h:80,maxH:85,maxW:64},
+    factsAction:{x:67,y:51,h:88,maxH:93,maxW:64},
+    promise:{x:64,y:51,h:88,maxH:93,maxW:64},
+    correction:{x:71,y:51,h:90,maxH:95,maxW:60},
+    deliver:{x:67,y:50,h:91,maxH:96,maxW:64},
+    concert:{x:64,y:50,h:89,maxH:94,maxW:64},
+    ending:{x:73,y:51,h:82,maxH:87,maxW:64},
+    chorus:{x:34,y:50,h:80,maxH:85,maxW:46},
+    comedy:{x:32,y:56,h:80,maxH:90,maxW:52}
+  };
+  let key=scene?.layout||'default';
+  if(key==='facts')key='factsAction';
+  const p={...(profiles[key]||{x:65,y:51,h:84,maxH:89,maxW:64}),scale:1};
+  if(pose){
+    p.x=pose.x??p.x;
+    p.y=pose.y??p.y;
+    p.h=pose.height??p.h;
+    p.scale=pose.scale??1;
+  }
+  // One layout profile is the sole source of x/y/size. Motion is applied through CSS variables elsewhere.
+  el.classList.add('layout-controlled');
+  el.style.setProperty('--hero-x',p.x+'%');
+  el.style.setProperty('--hero-y',p.y+'%');
+  el.style.setProperty('--hero-h',p.h+'%');
+  el.style.setProperty('--hero-max-h',p.maxH+'%');
+  el.style.setProperty('--hero-max-w',p.maxW+'%');
+  el.style.setProperty('--hero-scale',String(p.scale||1));
+  el.style.setProperty('--hero-jump','0px');  el.style.setProperty('--hero-squash','1');
+  el.style.width='auto';
+  el.style.objectPosition='center';
+}
+function updateBeat(t,scene,lyric,now){
+  const beatFloat=(t-OFFSET)/BEAT,beatPhase=((beatFloat%1)+1)%1,beatIndex=Math.floor(beatFloat+1e-5);
+  const kick=t<OFFSET?0:Math.pow(1-beatPhase,4),bounce=t<OFFSET?0:Math.abs(Math.sin(beatFloat*Math.PI));
+  document.documentElement.style.setProperty('--kick',kick.toFixed(4));
+  document.documentElement.style.setProperty('--beat',beatPhase.toFixed(4));
+  document.documentElement.style.setProperty('--pulse',kick.toFixed(4));
+  const chorus=chorusAt(t);
+  const promiseChorus=scene.code==='SC-11'&&chorus?.id==='CH3';
+  const chorusVisualMatches=!!chorus&&((scene.code==='SC-05'&&chorus.id==='CH1')||(scene.code==='SC-07'&&chorus.id==='CH2')||(scene.code==='SC-14'&&chorus.id==='FINAL')||(scene.code==='SC-15'&&chorus.id==='FINAL'));
+  if(promiseChorus){
+    const beams=[...stageGlow.querySelectorAll('.lightbeam')];
+    beams.forEach((el,i)=>{const base=[-16,-7,8,17,-11,-3,4,12][i%8];el.style.transform=`rotate(${base+Math.sin(beatFloat*.5+i*.82)*4}deg)`;el.style.opacity=String(.34+kick*.32);});
+  }
+  if(chorusVisualMatches){
+    if(beatIndex!==lastBeatIndex){lastBeatIndex=beatIndex;}
+    // Keep all movement audio-clocked, so seeking never desynchronizes the loops.
+    const beams=[...stageGlow.querySelectorAll('.lightbeam')];
+    beams.forEach((el,i)=>{const base=[-16,-7,8,17,-11,-3,4,12][i%8];el.style.transform=`rotate(${base+Math.sin(beatFloat*.5+i*.82)*4}deg)`;el.style.opacity=String((chorus.id==='CH3'||chorus.id==='FINAL')?.34+kick*.32:.08);});
+    dustEls.forEach((el,i)=>{const p=((t*.13+i*.071)%1+1)%1;el.style.transform=`translate3d(${Math.sin(beatFloat*.35+i)*18}px,${-p*112}vh,0) scale(${.65+kick*.4})`;el.style.opacity=(chorus.id==='CH3'||chorus.id==='FINAL')?String(Math.sin(p*Math.PI)*(.18+(i%5)*.05)):0;});
+    if(scene.code==='SC-07'&&chorus.id==='CH2'){
+      const bgBounce=Math.abs(Math.sin(beatFloat*Math.PI));
+      backdrop.style.transform=`translate3d(0,${(-bgBounce*9).toFixed(2)}px,0) scale(${1+kick*.009})`;
+    }else backdrop.style.transform='scale(1)';
+    return;
+  }
+  heroEls.filter(el=>el.classList.contains('sprite')).forEach(el=>{if(el.classList.contains('show')&&!el.classList.contains('character-switch'))el.style.transform='';});
+  const activeBody=$(activeMainHero());
+  const sc10LyricJump=scene.code==='SC-10'&&t>=145.494&&t<161.415;
+  const preAnswerJump=t>=206.630&&t<249.102;
+  const jumpEligible=['search','correction','deliver','comedy','promise'].includes(scene.layout)||sc10LyricJump||preAnswerJump;
+  if(activeBody?.classList.contains('fullbody')&&activeBody.classList.contains('show')){
+    if(jumpEligible){
+      const jumpBase=scene.code==='SC-03'?24:scene.layout==='deliver'?34:scene.layout==='correction'?38:scene.layout==='comedy'?17:scene.layout==='promise'?22:sc10LyricJump?30:preAnswerJump?22:28;
+      const wave=Math.abs(Math.sin(beatFloat*Math.PI));
+      const jump=wave*jumpBase;
+      const squash=1-Math.min(.03,jump*.0012);
+      activeBody.style.setProperty('--hero-jump',jump.toFixed(2)+'px');
+      activeBody.style.setProperty('--hero-squash',squash.toFixed(4));
+    }else{
+      activeBody.style.setProperty('--hero-jump','0px');
+      activeBody.style.setProperty('--hero-squash','1');
+    }
+  }
+  // In the comedy scene the right-side Q uses the qzone mascot, not a second sprite.
+  if(scene.layout==='comedy'&&visual.classList.contains('comic-q-visible')){
+    const q=$('qmascot'),wave=Math.abs(Math.sin(beatFloat*Math.PI)),jump=wave*22;
+    q.style.transform=`translate3d(0,${-jump.toFixed(2)}px,0) scaleX(${1+wave*.018}) scaleY(${1-wave*.022}) rotate(${Math.sin(beatFloat*Math.PI/2)*1.1}deg)`;
+  }
+  const energetic=['hook','finalhook','context','deliver','concert','comedy','correction','promise'].includes(scene.layout);
+  const chromatic=energetic&&((kick>.88)||(now<chromaticUntil))?1:0;
+  document.documentElement.style.setProperty('--chromatic',chromatic);
+  const local=t-scene.start,duration=Math.max(.01,scene.end-scene.start),progress=Math.min(1,Math.max(0,local/duration));
+  let base=1,panX=0,panY=0;
+  if(['opening','ending'].includes(scene.layout))base=1.12-.10*progress;
+  else if(['reflection','promise','correction'].includes(scene.layout)){base=1.015+.045*progress;panX=Math.sin(progress*Math.PI*1.4)*.7;panY=Math.cos(progress*Math.PI*1.2)*.4;}
+  else if(['search','facts','transition'].includes(scene.layout)){base=1.02+.035*progress;panX=Math.sin(progress*Math.PI*2)*.8;panY=Math.cos(progress*Math.PI*2)*.5;}
+  else if(['deliver','concert','hook','finalhook','context'].includes(scene.layout))base=1.01+.025*progress;
+  const cameraKick=(['correction','deliver'].includes(scene.layout)?kick*.007:(energetic?kick*.004:0));
+  base+=cameraKick;
+  document.documentElement.style.setProperty('--camScale',base.toFixed(4));
+  document.documentElement.style.setProperty('--camX',`${panX}%`);document.documentElement.style.setProperty('--camY',`${panY}%`);
+  if(promiseChorus&&activeBody?.classList.contains('layout-controlled'))activeBody.style.setProperty('--hero-scale',(1.015+.045*progress+kick*.004).toFixed(4));
+  if(scene.code==='SC-13'||scene.layout==='deliver'){
+    const buildup=clamp01((t-scene.start)/Math.max(.01,scene.end-scene.start));
+    const bgLift=6*buildup+bounce*(2+11*buildup);
+    const bgScale=1+.022*buildup+bounce*(.002+.007*buildup);
+    backdrop.style.transform=`translate3d(0,${-bgLift.toFixed(2)}px,0) scale(${bgScale.toFixed(4)})`;
+  }else if(promiseChorus)backdrop.style.transform=`translate3d(0,${(-bounce*9).toFixed(2)}px,0) scale(${1+kick*.009})`;
+  else backdrop.style.transform='scale(1)';
+  codeWindow.style.transform='perspective(1000px) rotateY(0deg) rotateX(0deg)';
+  $('sweepA').style.opacity=['search','facts','transition','correction'].includes(scene.layout)?String(.07+kick*.16):'0';
+  $('sweepB').style.opacity=['comedy','promise','deliver'].includes(scene.layout)?String(.05+kick*.12):'0';
+  $('sweepA').style.transform=`translateX(${((local*24)%160)-125}%) skewX(-18deg)`;
+  $('sweepB').style.transform=`translateX(${((local*31+35)%180)-135}%) skewX(-18deg)`;
+  heroEls.filter(el=>el.classList.contains('fullbody')&&el.classList.contains('show')).forEach(el=>{
+    el.style.setProperty('--camScale',base.toFixed(4));el.style.setProperty('--camX',`${panX}%`);el.style.setProperty('--camY',`${panY}%`);
+    el.style.filter='drop-shadow(0 0 2px rgba(255,255,255,.65)) drop-shadow(0 0 14px rgba(151,231,255,.24)) drop-shadow(0 16px 24px rgba(0,0,0,.42)) saturate(1.05) contrast(1.03)';
+  });
+  if(lyric&&lastLyricId!==lyric.id&&scene.code!=='SC-09'){
+    if(!['comedy','context'].includes(scene.layout))popStamp(stampMap[lyric.id]||'',now);
+    if(scene.layout==='comedy'&&lyric.id==='L034')triggerShake(now);
+    if(scene.layout==='context'&&lyric.id==='L053')triggerShake(now);
+  }
+  if(now>stampUntil){stamp.style.opacity='0';stamp.style.transform='translateY(8px) scale(.96)';}
+  flash.style.opacity='0';
+  if(now>shakeUntil)app.classList.remove('screen-shake');
+  cautionTape.classList.remove('on');
+  waitPause.classList.toggle('on',false);
+  const star=waitPause.querySelector('.singleStar');if(star){star.style.opacity=String(.55+.35*(.5+.5*Math.sin(beatFloat*Math.PI)));star.style.transform=`scale(${.88+kick*.16})`;}
+  const pageActive=['search','facts','correction'].includes(scene.layout)||(scene.layout==='transition'&&t>=22.909&&t<32.107);
+  pageLayer.classList.toggle('on',pageActive);
+  pageEls.forEach((el,i)=>{
+    const depth=['far','mid','near'][i%3],speed=depth==='far'?12:depth==='mid'?24:38;
+    const phase=i*.71+t*(depth==='near'?1.05:depth==='mid'?.52:.28);
+    const x=((i*29+t*speed*.7)%145)-22,y=((i*17+t*speed*.5)%140)-20;
+    const correctionPage=scene.layout==='correction';
+    el.style.left=`${x}%`;el.style.top=`${y}%`;el.style.opacity=pageActive?(correctionPage?(i<4?(depth==='far'?'.18':'.24'):0):(depth==='far'?'.35':depth==='mid'?'.55':'.32')):'0';
+    el.style.transform=`translate3d(${Math.sin(phase)*1.5}vw,${Math.cos(phase)*1.1}vh,0) rotate(${Math.sin(phase*1.8)*12+kick*4}deg) scale(${depth==='near'?.8:depth==='mid'?.55:.35})`;
+  });
+  const particlesOn=['deliver'].includes(scene.layout)||promiseChorus;particleLayer.classList.toggle('on',particlesOn);
+  dustEls.forEach((el,i)=>{const p=((t*.13+i*.071)%1+1)%1;el.style.transform=`translate3d(${Math.sin(beatFloat*.35+i)*18}px,${-p*112}vh,0) scale(${.65+kick*.4})`;el.style.opacity=particlesOn?String(Math.sin(p*Math.PI)*(.12+(i%5)*.035)):0;});
+  speedTunnel.classList.toggle('on',scene.layout==='deliver');speedTunnel.style.transform=`rotate(${beatFloat*.18}deg) scale(${1+kick*.012})`;speedTunnel.style.opacity=scene.layout==='deliver'?String(.035+kick*.075):'0';
+  spectrumBars.classList.toggle('on',promiseChorus);
+  spectrumEls.forEach((el,i)=>{const wave=Math.abs(Math.sin(beatFloat*Math.PI*.75+i*.61));el.style.transform=`scaleY(${.08+wave*(.18+kick*.45)})`;});
+  const endingPerformanceStart=258.723;
+  const endingPeek=scene.layout==='ending'&&t>=endingPerformanceStart;
+  visual.classList.toggle('ending-peek',endingPeek);
+  const showLastThing=scene.layout==='ending'&&t>=258.723;
+  endingBubble.classList.toggle('on',showLastThing);
+  if(showLastThing)endingBubble.textContent='ONE LAST THING?';
+  if(endingPeek){
+    const q=$('hero17'),wave=Math.abs(Math.sin(beatFloat*Math.PI)),jump=wave*12;
+    if(q&&q.classList.contains('show'))q.style.setProperty('transform',`translate3d(0,${-jump.toFixed(2)}px,0) rotate(${(-5+Math.sin(beatFloat*Math.PI/2)*1.2).toFixed(2)}deg)`,'important');
+  }
+  const beams=[...stageGlow.querySelectorAll('.lightbeam')];beams.forEach((el,i)=>{const base=[-16,-7,8,17,-11,-3,4,12][i%8];el.style.transform=`rotate(${base+Math.sin(beatFloat*.5+i*.82)*3}deg)`;el.style.opacity=scene.layout==='concert'?String(.25+kick*.2):'0';});
+}
+function applyCodeChorus(chorus,scene,t,lyric){
+  const local=Math.max(0,t-scene.start),duration=Math.max(.01,scene.end-scene.start),progress=clamp01(local/duration);
+  const first=chorus.id==='CH1',finalPass=chorus.id==='FINAL',total=codeLines.length;
+  const lineCount=8+Math.floor(local*3.2);
+  visual.classList.remove('chorus-mode','comic-mode','break-mode','answer-mode');visual.classList.add('code-window-active');
+  heroEls.forEach(el=>el.classList.remove('show'));lastHero='';
+  backdrop.style.backgroundImage="url('assets/BG03.webp')";
+  workScene.classList.add('on','rolling-code');
+  comedy.style.display='none';contextWord.style.display='none';answerCard.style.display='none';
+  stageGlow.classList.remove('on');pageLayer.classList.remove('on');particleLayer.classList.remove('on');checkRain.classList.remove('on');spectrumBars.classList.remove('on');speedTunnel.classList.remove('on');
+  renderRollingCode(lineCount,finalPass);
+  codeEls.forEach((el,i)=>{
+    const active=i<lineCount;
+    el.classList.add('on');
+    el.classList.toggle('hot',i===lineCount-1);
+    el.classList.toggle('verified',finalPass&&active&&i>=lineCount-3);
+    el.classList.toggle('pending-line',!active);
+  });
+  const lineHeight=codeEls[0]?.getBoundingClientRect().height||20;
+  const maxScroll=Math.max(0,codeBody.scrollHeight-codeBody.clientHeight);
+  const linePhase=((local*3.2)%1+1)%1;
+  codeBody.scrollTop=Math.max(0,Math.min(maxScroll,maxScroll-lineHeight+linePhase*lineHeight));
+  codeFill.style.width=Math.min(100,lineCount/24*100)+'%';
+  $('codeProgress').textContent=String(lineCount).padStart(3,'0')+' LINES';
+  $('codeStatus').textContent=first?'CHECKING · LIVE':'✓ VERIFIED · LIVE';
+  $('scanline').style.top=(12+((local*18)%70))+'%';
+  $('taskStamp').textContent=first?'LIVE CHECK LOOP':'VERIFIED ANSWER LOOP';
+  const id=lyric?.id||'';
+  if(lyric&&qMap[id])lastWorkQSrc=qMap[id];else if(lyric&&finalPass&&!qMap[id])lastWorkQSrc='assets/Q05.webp';
+  const src=lastWorkQSrc||(first?'assets/Q01.webp':'assets/Q05.webp');
+  if($('qmascot').getAttribute('src')!==src)$('qmascot').setAttribute('src',src);
+  const q=qText[id]|| (first?['CHECK THE FACTS','READY TO CHECK']:['VERIFIED','VERIFIED']);
+  $('qtag1').style.display='block';$('qtag2').textContent='';$('qtag2').style.display='none';$('qtag1').textContent=q[0];$('workState').textContent=q[1];
+  const beatFloat=(t-OFFSET)/BEAT,phase=((beatFloat%1)+1)%1,kick=t<OFFSET?0:Math.pow(1-phase,4),bounce=Math.abs(Math.sin(beatFloat*Math.PI/2));
+  codeWindow.style.transform=`perspective(1000px) translateY(${-bounce*2}px) scale(${1+kick*.006})`;
+  $('qmascot').style.transform=`translate3d(0,${-bounce*10}px,0) scaleX(${1+kick*.014-bounce*.006}) scaleY(${1-kick*.014+bounce*.01}) rotate(${Math.sin(beatFloat*Math.PI/4)*.8}deg)`;
+  codeWindow.style.boxShadow=`0 0 0 5px rgba(167,139,255,.04),0 0 ${38+kick*16}px rgba(106,88,200,.22),inset 0 0 40px rgba(146,121,255,.05)`;
+}
+function updateEndingReveal(scene,t,lyric){
+  const active=scene?.code==='SC-16'&&t>=249.102&&t<251.969;
+  endingReveal.classList.toggle('on',active);
+  endingReveal.classList.remove('returning');
+  if(!active)return;
+  const tag=$('endingRevealTag'),main=$('endingRevealMain'),sub=$('endingRevealSub');
+  if(t<251.183){
+    tag.textContent='QUESTION RECEIVED';main.textContent='ANSWER READY';sub.textContent='CHECK → CLARIFY → ANSWER';
+    const p=clamp01((t-249.102)/(251.183-249.102));
+    endingReveal.style.setProperty('--ring-scale',String(.82+.18*p));
+    endingReveal.style.setProperty('--ring-opacity',String(.35+.45*p));
+    endingReveal.style.setProperty('--cross-angle',String((t-249.102)*18+'deg'));
+  }else{
+    tag.textContent='RESPONSE CONFIRMED';main.textContent='ANSWER DELIVERED';sub.textContent='CLEAR WHEN KNOWN · HONEST WHEN NOT';
+    endingReveal.style.setProperty('--ring-scale','1.04');
+    endingReveal.style.setProperty('--ring-opacity','.92');
+    endingReveal.style.setProperty('--cross-angle','0deg');
+  }
+}
+const THOUGHT_BRIEF_DATA={
+  'SC-03':[
+    {start:32.107,end:33.683,kicker:'01 / SCAN',title:'Read the whole prompt',body:'Pages and screens are inputs—not proof by themselves.',foot:'PROMPT FIRST'},
+    {start:33.683,end:35.475,kicker:'02 / CONTEXT',title:'Three notes, one reply',body:'Bring the prompt, context, and relevant evidence into the same view.',foot:'INPUT + CONTEXT + FACTS'},
+    {start:35.475,end:36.598,kicker:'03 / VERIFY',title:'Check the claims',body:'Separate what the prompt says from what can actually be verified.',foot:'CLAIMS → FACTS'},
+    {start:36.598,end:38.366,kicker:'04 / CONNECT',title:'Link the clues',body:'A useful answer explains how the evidence fits together.',foot:'CLUE A ↔ CLUE B'},
+    {start:38.366,end:39.820,kicker:'05 / HOLD OPEN',title:'Maybe yes. Maybe not.',body:'Keep competing explanations open until the facts distinguish them.',foot:'HYPOTHESIS ≠ CONCLUSION'},
+    {start:39.820,end:41.190,kicker:'06 / INVENTORY',title:'What do we have?',body:'Review the available signals before deciding what is still missing.',foot:'KNOWN · UNKNOWN'},
+    {start:41.190,end:43.110,kicker:'07 / DOUBT',title:'One more detail',body:'Notice the uncertainty that could change the answer.',foot:'CHECK THE PIVOTAL DETAIL'},
+    {start:43.110,end:44.497,kicker:'08 / SYNTHESIZE',title:'Make it make sense',body:'Connect the evidence into a clear, useful conclusion.',foot:'EVIDENCE → REASONING → ANSWER'}
+  ],
+  'SC-10':[
+    {start:144.161,end:145.494,kicker:'00 / PREPARE',title:'Listen first',body:'Define the question before collecting more.',foot:'QUESTION → EVIDENCE'},
+    {start:145.494,end:147.103,kicker:'01 / COLLECT',title:'Facts + clues',body:'Gather what is actually given.',foot:'COLLECT · DO NOT GUESS'},
+    {start:147.103,end:148.707,kicker:'02 / ALTERNATIVES',title:'More than one path',body:'Test another explanation.',foot:'COMPARE POSSIBILITIES'},
+    {start:148.707,end:150.633,kicker:'03 / FILTER',title:'Signal / noise',body:'Keep what can change the answer.',foot:'RELEVANCE OVER VOLUME'},
+    {start:150.633,end:152.010,kicker:'04 / AGENCY',title:'Find your voice',body:'Support the user, not the model’s performance.',foot:'HELP THE USER THINK'},
+    {start:152.010,end:153.384,kicker:'05 / CLEAR',title:'Simple → concise',body:'When it is simple, answer directly.',foot:'CLEAR DOES NOT NEED EXTRA WORDS'},
+    {start:153.384,end:154.959,kicker:'06 / CONTEXT',title:'Tricky → stay',body:'Add depth only when the problem needs it.',foot:'DEPTH WHEN IT MATTERS'},
+    {start:154.959,end:157.905,kicker:'07 / CALIBRATE',title:'Do not overclaim',body:'Separate what is known from what is missing.',foot:'FACTS · UNCERTAINTY · LIMITS'},
+    {start:157.905,end:161.415,kicker:'08 / PAUSE',title:'Pause before guessing',body:'The next best move may be to stop and check.',foot:'PAUSE IS ALSO A DECISION'},
+    {start:161.415,end:162.859,kicker:'09 / CERTAINTY',title:'What is actually known?',body:'Check certainty and clarity separately.',foot:'CERTAINTY ≠ CLARITY'},
+    {start:162.859,end:164.500,kicker:'10 / GAPS',title:'What is missing?',body:'Name the missing evidence instead of filling it in.',foot:'MISSING DATA STAYS MISSING'},
+    {start:164.500,end:166.172,kicker:'11 / SIMPLIFY',title:'Do not add complexity',body:'Use only the explanation the question needs.',foot:'NO EXTRA WORDS FOR EFFECT'},
+    {start:166.172,end:168.074,kicker:'12 / REASON',title:'One good reason',body:'Stop when the evidence is enough.',foot:'ENOUGH IS ENOUGH'}
+  ],
+  'SC-13':[
+    {start:206.630,end:208.176,kicker:'01 / RECEIVE',title:'Question received',body:'Stay available; do not overcomplicate the opening.',foot:'LISTEN → UNDERSTAND'},
+    {start:208.176,end:209.744,kicker:'02 / CLARIFY',title:'Request the missing detail',body:'Ask only for what changes the answer.',foot:'NECESSARY CONTEXT ONLY'},
+    {start:209.744,end:211.455,kicker:'03 / RESOLVE',title:'Evidence converges',body:'When the answer is clear, prepare to deliver it.',foot:'CHECK → DECIDE'},
+    {start:211.455,end:216.824,kicker:'04 / DELIVER',title:'Say it clearly',body:'Do not hide a useful answer behind more words.',foot:'CLEAR · DIRECT · USEFUL'}
+  ]
+};
+function updateThoughtBrief(scene,t,lyric){
+  const panel=$('thoughtBrief');
+  const list=THOUGHT_BRIEF_DATA[scene?.code];
+  const active=!!list;
+  panel.classList.toggle('on',active);
+  panel.setAttribute('aria-hidden',active?'false':'true');
+  if(!active)return;
+  let item=list.find(x=>t>=x.start&&t<x.end)||list[list.length-1];
+  const key=scene.code+'|'+item.kicker;
+  if(panel.dataset.key!==key){
+    panel.dataset.key=key;
+    $('thoughtKicker').textContent=item.kicker;
+    $('thoughtTitle').textContent=item.title;
+    $('thoughtBody').textContent=item.body;
+    $('thoughtFoot').textContent=item.foot;
+    $('thoughtState').textContent=scene.code==='SC-03'?'LIVE SCAN':scene.code==='SC-10'?'SIGNAL':'ANSWER';
+    $('thoughtTrackFill').style.width=((list.indexOf(item)+1)/list.length*100)+'%';
+  }
+}
+const DRAGON_BOILERPLATE_LINES=[
+  {start:186.820,end:188.399,text:'也许我确实判断有误；让我重新检查问题本身及此前的推理过程。'},
+  {start:188.399,end:190.194,text:'为了形成更好的答案，我会结合当前语境与已知信息重新梳理。'},
+  {start:190.194,end:191.546,text:'你说得对，这部分我遗漏了。感谢指出，我会在下文补充说明。'},
+  {start:191.546,end:193.062,text:'这并不意味着先前内容全盘作废，而是开启一轮更全面的修正。'},
+  {start:193.062,end:194.641,text:'当然，我没有水晶球，也不可能掌握所有变量与完整视角。'},
+  {start:194.641,end:196.432,text:'因此，我将谨慎区分事实、推断与假设，并逐项说明其依据与边界。'},
+  {start:196.432,end:197.798,text:'如果问题本身已经足够明确，'},
+  {start:197.798,end:200.401,text:'为了确保表达完整，我仍会补充背景、注意事项、替代解释及后续建议。'}
+];
+function updateDragonBoilerplate(scene,t){
+  const panel=$('dragonBoilerplate'),body=$('dragonBoilerplateText'),state=$('dragonTypingState');
+  const active=scene?.code==='SC-12';
+  panel.classList.toggle('on',active);
+  panel.setAttribute('aria-hidden',active?'false':'true');
+  visual.classList.toggle('dragon-boilerplate-active',active);
+  if(!active)return;
+  const visible=[];let completed=0;let current=0;
+  for(const line of DRAGON_BOILERPLATE_LINES){
+    if(t<line.start)break;
+    if(t>=line.end){visible.push(line.text);completed++;continue;}
+    const p=clamp01((t-line.start)/(line.end-line.start));
+    visible.push(line.text.slice(0,Math.floor(line.text.length*p)));
+    current=completed+1;
+    break;
+  }
+  body.textContent=visible.join('\n');
+  const done=completed===DRAGON_BOILERPLATE_LINES.length;
+  panel.classList.toggle('complete',done);
+  state.textContent=done?'COMPLETE · 08/08':`GENERATING · ${String(current||Math.min(completed+1,8)).padStart(2,'0')}/08`;
+}
+
+function applyCGReflection(scene,t){
+  const s59=$('cgSceneS59'),s63=$('cgSceneS63');
+  const knowingEnd=141.262,blendEnd=141.862,fadeOutStart=scene.end-.5;
+  const zoomP=clamp01((t-scene.start)/(knowingEnd-scene.start));
+  const zoomEase=zoomP*zoomP*(3-2*zoomP);
+  s59.style.transformOrigin='55% 36%';
+  s59.style.setProperty('--camScale',(1+.32*zoomEase).toFixed(4));
+  s59.style.setProperty('--camX','0%');s59.style.setProperty('--camY','0%');
+  s63.style.transformOrigin='52% 32%';
+  s63.style.setProperty('--camScale','1.025');s63.style.setProperty('--camX','0%');s63.style.setProperty('--camY','0%');
+
+  if(t<knowingEnd){
+    setHero('cgSceneS59');
+    s59.style.opacity='1';s63.style.opacity='0';
+  }else if(t<blendEnd){
+    setHero(['cgSceneS59','cgSceneS63']);
+    const blend=clamp01((t-knowingEnd)/(blendEnd-knowingEnd));
+    s59.style.opacity=String(1-blend);s63.style.opacity=String(blend);
+  }else{
+    setHero('cgSceneS63');
+    s59.style.opacity='0';s63.style.opacity='1';
+  }
+
+  // Reveal SC-10's BG03 under the outgoing CG, then fade the CG fully away.
+  if(t>=fadeOutStart){
+    backdrop.style.backgroundImage="url('assets/BG03.webp')";
+    backdrop.style.backgroundColor='';
+    setHero('cgSceneS63');
+    s59.style.opacity='0';
+    s63.style.opacity=String(1-clamp01((t-fadeOutStart)/(scene.end-fadeOutStart)));
+  }else{
+    backdrop.style.backgroundImage='none';
+    backdrop.style.backgroundColor='#000';
+  }
+
+  visual.classList.remove('chorus-mode','comic-mode','break-mode','answer-mode','video-mode','code-window-active');
+  comedy.style.display='none';workScene.classList.remove('on','rolling-code');
+  contextWord.style.display='none';answerCard.style.display='none';
+  stageGlow.classList.remove('on');pageLayer.classList.remove('on');particleLayer.classList.remove('on');
+  checkRain.classList.remove('on');spectrumBars.classList.remove('on');speedTunnel.classList.remove('on');
+  cautionTape.classList.remove('on');waitPause.classList.remove('on');
+  stamp.style.opacity='0';
+}
+function applyPromiseCode(scene,t,lyric){
+  const local=Math.max(0,t-scene.start),duration=Math.max(.01,scene.end-scene.start);
+  // One new line per beat at 152 BPM; audio time is the sole clock, so seeking is deterministic.
+  const beatCount=Math.max(1,Math.floor(local/BEAT)+1);
+  const lineCount=Math.min(48,beatCount);
+  workScene.classList.add('on','rolling-code');
+  renderRollingCode(lineCount,false);
+  const lineHeight=codeEls[0]?.getBoundingClientRect().height||20;
+  const maxScroll=Math.max(0,codeBody.scrollHeight-codeBody.clientHeight);
+  const beatPhase=((local/BEAT)%1+1)%1;
+  codeBody.scrollTop=Math.max(0,Math.min(maxScroll,maxScroll-lineHeight+beatPhase*lineHeight));
+  codeFill.style.width=(clamp01(local/duration)*100).toFixed(2)+'%';
+  $('codeProgress').textContent=String(lineCount).padStart(3,'0')+' / 048';
+  const stateByLyric={
+    L074:['CHECK WHEN IT MATTERS','CHECKING · BEAT SYNC'],
+    L075:["ANSWER WHEN IT'S CLEAR",'READY · CLEAR'],
+    L076:['CHECK WHEN IT MATTERS','CHECKING · BEAT SYNC'],
+    L077:['USER NEEDS FIRST','MATCHING THE QUESTION'],
+    L078:['KEEP IT BRIEF','TRIMMING OUTPUT'],
+    L079:['SHOW WHAT IS MISSING','GAPS IDENTIFIED'],
+    L080:['NO MORE WORDS FOR EFFECT','REMOVING NOISE'],
+    L081:['CHECK WHEN IT MATTERS','FACTS VERIFIED'],
+    L082:["ANSWER WHEN IT'S CLEAR",'DELIVERING']
+  };
+  const [stampText,stateText]=stateByLyric[lyric?.id]||['CHECK / VERIFY','LIVE · BEAT SYNC'];
+  $('taskStamp').textContent=stampText;
+  $('workState').textContent=stateText;
+  $('codeStatus').textContent=lyric?.id==='L075'||lyric?.id==='L077'||lyric?.id==='L082'?'CLEAR · ANSWER':'CHECK · LIVE';
+  $('scanline').style.top=(12+((local/BEAT*9)%70))+'%';
+  const phase=((local/BEAT)%1+1)%1,kick=Math.pow(1-phase,4),bounce=Math.abs(Math.sin(local/BEAT*Math.PI/2));
+  codeWindow.style.transform=`perspective(1000px) translateY(${-bounce*2}px) scale(${1+kick*.006})`;
+  codeWindow.style.boxShadow=`0 0 0 5px rgba(167,139,255,.04),0 0 ${38+kick*16}px rgba(106,88,200,.22),inset 0 0 40px rgba(146,121,255,.05)`;
+}
+
+function applyScene(idx,t,lyric,now){
+  if(idx<0)return;
+  const s=scenes[idx],local=t-s.start,chorus=chorusAt(t);
+  visual.classList.toggle('comic-q-visible',s.layout==='comedy');
+  if(idx!==currentScene){
+    currentScene=idx;lastSceneChange=now;
+    if(s.layout==='comedy')lastComicQ='hero13';
+    if(s.layout==='hook'||s.layout==='finalhook')lastWorkQSrc='assets/Q01.webp';
+    $('sceneCode').textContent=s.code;$('materialTag').textContent=s.tag;$('sceneKicker').textContent=s.kicker;$('sceneTitle').textContent=s.title;$('sceneDesc').textContent=s.desc;$('chapterPill').textContent=s.range;
+    if(!chorus||s.code==='SC-11'){
+      if(s.code==='SC-09'){backdrop.style.backgroundImage='none';backdrop.style.backgroundColor='#000';}
+      else{backdrop.style.backgroundImage=`url('${s.bg}')`;backdrop.style.backgroundColor='';}
+    }
+    document.querySelectorAll('.chapterNav button').forEach((b,i)=>b.classList.toggle('active',i===idx));
+    document.querySelector('.chapterNav button.active')?.scrollIntoView({block:'nearest',inline:'nearest'});
+  }
+  updateVideoSlot(s);
+  updateVideoLayer(s,t,lyric,chorus);
+  updateWindowFx(s,t);
+  updateEndingReveal(s,t,lyric);
+  updateThoughtBrief(s,t,lyric);
+  updateDragonBoilerplate(s,t);
+  updateWaitType(t,s,lyric);
+  visual.classList.toggle('pre-answer-fade',t>=118.78&&t<119.169);
+  const promiseCodeScene=s.code==='SC-11'&&chorus?.id==='CH3';
+  const codeWindowAllowed=(s.code==='SC-05'&&chorus?.id==='CH1')||(s.code==='SC-14'&&chorus?.id==='FINAL')||promiseCodeScene;
+  visual.classList.toggle('code-window-active',!!codeWindowAllowed);
+  visual.classList.toggle('promise-code-active',!!promiseCodeScene);
+  if(!codeWindowAllowed){$('qtag1').style.display='';$('qtag2').style.display='';}
+  if(!codeWindowAllowed)workScene.classList.remove('on','rolling-code');
+  if(s.code==='SC-01'&&t<4.151){
+    visual.classList.add('opening-black');
+    backdrop.style.backgroundImage='none';backdrop.style.backgroundColor='#000';
+    setHero(null);workScene.classList.remove('on','rolling-code');comedy.style.display='none';
+    visual.classList.remove('chorus-mode','comic-mode','break-mode','answer-mode','ending-peek','window-closing','code-window-active');
+    stageGlow.classList.remove('on');pageLayer.classList.remove('on');particleLayer.classList.remove('on');checkRain.classList.remove('on');spectrumBars.classList.remove('on');speedTunnel.classList.remove('on');
+    updateTypeLayer(t,s,lyric,null);return;
+  }
+  visual.classList.remove('opening-black');
+  if(s.code==='SC-01'&&t>=4.151){backdrop.style.backgroundImage="url('assets/BG02.webp')";backdrop.style.backgroundColor='';}
+  const codeChorus=!!chorus&&((chorus.id==='CH1'&&s.code==='SC-05')||(chorus.id==='FINAL'&&s.code==='SC-14'));
+  const poseChorus=!!chorus&&((chorus.id==='CH2'&&s.code==='SC-07')||(chorus.id==='FINAL'&&s.code==='SC-15'));
+  if(codeChorus||poseChorus){
+    if(lastChorusId!==chorus.id){lastChorusId=chorus.id;lastTypeLyricId='';lastHero='';}
+    if(codeChorus){
+      visual.classList.add('code-window-active');
+      applyCodeChorus(chorus,s,t,lyric);
+      updateBeat(t,s,lyric,now);
+      updateTypeLayer(t,s,lyric,chorus);
+      stamp.style.opacity='0';
+      return;
+    }
+    visual.classList.remove('code-window-active');visual.classList.add('chorus-mode');visual.classList.remove('comic-mode','break-mode','answer-mode');
+    comedy.style.display='none';workScene.classList.remove('on','rolling-code');contextWord.style.display='none';answerCard.style.display='none';
+    applyChorusFrame(chorus,t,lyric,s);
+    updateBeat(t,s,lyric,now);
+    updateTypeLayer(t,s,lyric,chorus);
+    stamp.style.opacity='0';
+    return;
+  }
+  lastChorusId='';visual.classList.remove('chorus-mode');
+  if(!promiseCodeScene){visual.classList.remove('code-window-active');workScene.classList.remove('on','rolling-code');}
+  const layout=s.layout;
+  if(!promiseCodeScene){workScene.classList.toggle('on',false);workScene.classList.remove('rolling-code');}
+  comedy.style.display=layout==='comedy'?'block':'none';visual.classList.toggle('comic-mode',layout==='comedy');
+  contextWord.style.display='none';answerCard.style.display='none';
+  visual.classList.toggle('break-mode',layout==='answer');visual.classList.toggle('answer-mode',layout==='answer');
+  if(layout==='answer'){backdrop.style.backgroundImage='none';backdrop.style.backgroundColor='#02030a';setHero(null);stageGlow.classList.remove('on');pageLayer.classList.remove('on');particleLayer.classList.remove('on');checkRain.classList.remove('on');spectrumBars.classList.remove('on');}
+  const promiseChorus=s.code==='SC-11'&&chorus?.id==='CH3';
+  stageGlow.classList.toggle('on',layout==='concert'||promiseChorus);
+  if(s.code==='SC-11'){
+    pageLayer.classList.remove('on');checkRain.classList.remove('on');speedTunnel.classList.remove('on');
+    cautionTape.classList.remove('on');
+  }
+  if(s.code==='SC-09'){
+    applyCGReflection(s,t);
+    updateBeat(t,s,lyric,now);
+    updateTypeLayer(t,s,lyric,null);
+    stamp.style.opacity='0';
+    return;
+  }
+  const hero=stableHeroFor(s,t,lyric);
+  if(layout==='comedy'){
+    const qComic={
+      L027:'hero13',L028:'hero14',L029:'hero15',L030:'hero16',
+      L031:'hero13',L032:'hero14',L033:'hero15',L034:'hero17',
+      L035:'hero17',L036:'hero17',L037:'hero17',L038:'hero17',
+      L039:'hero15',L040:'hero15',L041:'hero15',L042:'hero15'
+    };
+    if(lyric&&qComic[lyric.id])lastComicQ=qComic[lyric.id];
+    const qAsset=({
+      hero13:'assets/Q01.webp',hero14:'assets/Q02.webp',hero15:'assets/Q03.webp',
+      hero16:'assets/Q04.webp',hero17:'assets/Q05.webp'
+    })[lastComicQ||'hero13']||'assets/Q01.webp';
+    // One main full-body illustration + one right-side Q mascot only.
+    // The Q sprites (hero13–hero17) are deliberately not shown in this scene,
+    // preventing a stale center sprite from flashing over the intended right Q.
+    setHero('hero1');
+    positionFullbodyHero('hero1',s,t,lyric);
+    if($('qmascot').getAttribute('src')!==qAsset)$('qmascot').setAttribute('src',qAsset);
+    $('qtag1').style.display='none';$('qtag2').style.display='none';
+    const isRight=lyric&&rightLines.has(lyric.id);
+    $('bubble1').style.display=isRight?'none':'block';$('bubble2').style.display=isRight?'block':'none';
+    $('bubble1').querySelector('.bubbleText').textContent=lyric?.text||'Let me check!';
+    $('bubble2').querySelector('.bubbleText').textContent=lyric?.text||'WAIT—ONE CAVEAT!';
+    const popLine=!!lyric&&['L027','L030','L034','L042'].includes(lyric.id);
+    $('bubble1').classList.toggle('pop',popLine&&!isRight);
+    $('bubble2').classList.toggle('pop',popLine&&isRight);
+  }else{
+    visual.classList.remove('comic-mode');
+    $('qtag1').style.display='';$('qtag2').style.display='';
+    if(layout==='answer')setHero(null);else{setHero(hero);positionFullbodyHero(hero,s,t,lyric);}
+  }
+  // Ending choreography: reveal answer, play A in reverse, close and reopen the window, then reveal Q05.
+  if(layout==='ending'){
+    if(t>=251.969&&t<258.723){setHero(null);}
+    else if(t>=258.723){setHero('hero17');}
+  }
+  if(promiseCodeScene)applyPromiseCode(s,t,lyric);
+  updateBeat(t,s,lyric,now);
+  updateTypeLayer(t,s,lyric,s.code==='SC-11'&&chorus?.id==='CH3'?chorus:null);
+}
+function render(now){
+  const t=audio.currentTime||0,idx=sceneAt(t),lyric=activeLyric(t);
+  applyScene(idx,t,lyric,now/1000);
+  if(lyric){
+    $('lyric').innerHTML=esc(lyric.text)+`<small>${lyric.id} · ${scenes[idx]?.kicker||''}</small>`;
+    lastLyricId=lyric.id;
+    englishSubtitle.textContent=lyric.text;
+    chineseSubtitle.textContent=BILINGUAL_ZH[lyric.id]||'';
+    subtitleStack.classList.add('on');
+  }else{
+    $('lyric').innerHTML=`<span style="opacity:.7">♪ instrumental / visual breathing space ♪</span><small>${scenes[idx]?.kicker||'INTERLUDE'}</small>`;
+    lastLyricId='';englishSubtitle.textContent='';chineseSubtitle.textContent='';
+    subtitleStack.classList.remove('on');
+  }
+  $('clock').textContent=fmt(t)+' / 04:20.0';$('seek').value=t;$('seek').style.setProperty('--pct',(t/260.014*100)+'%');$('playBtn').textContent=audio.paused?'▶':'Ⅱ';
+  requestAnimationFrame(render);
+}
+
+// The check-rain is intentionally limited to the second chorus; it is not a permanent overlay.
+for(let i=0;i<12;i++){
+  const el=document.createElement('span');el.className='checkDrop';el.textContent='✓';el.style.fontSize=`${18+(i%4)*7}px`;checkRain.appendChild(el);
+}
+document.querySelectorAll('.scopeOption').forEach(btn=>btn.addEventListener('click',()=>{
+  const slotId=videoPlaceholder.dataset.slotId;if(!slotId)return;
+  scopeSelections[slotId]=btn.dataset.scope;
+  document.querySelectorAll('.scopeOption').forEach(b=>b.classList.toggle('selected',b.dataset.scope===btn.dataset.scope));
+  scopeStatus.textContent='已选择：'+scopeLabels[btn.dataset.scope]+' · 记录在本次审片会话';
+}));
+audio.addEventListener('seeking',()=>{lastTypeLyricId='';lastLyricId='';lastHero='';lastChorusId='';lastVideoSlotCode='';activeVideoId='';activeVideoMode='';lastReverseFrame=-1;lastStableHeroSceneCode='';lastStableHero='';lastHeroSwitchAt=-999;lastComicQ='hero13';heroEls.forEach(el=>{el.classList.remove('character-switch','ending-peeked','show');el.style.transform='';el.style.opacity='';});workScene.classList.remove('on','rolling-code');visual.classList.remove('code-window-active','promise-code-active','pre-answer-fade','video-mode');waitType.classList.remove('on');waitPause.classList.remove('on');Object.values(reviewVideos).forEach(v=>{v.pause();v.classList.remove('active');});videoLayer.classList.remove('on');});
+audio.addEventListener('pause',()=>{Object.values(reviewVideos).forEach(v=>{if(!v.paused)v.pause();});});
+audio.addEventListener('play',()=>{if(activeVideoId&&activeVideoMode==='fit'&&reviewVideos[activeVideoId]?.dataset.ready==='1'&&!reviewVideos[activeVideoId].ended)reviewVideos[activeVideoId].play().catch(()=>{});});
+
+
+const nav=$('chapterNav');
+scenes.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.code+' · '+s.title.split('｜')[0].slice(0,13);b.title=s.title;b.addEventListener('click',()=>{audio.currentTime=s.start;audio.play().catch(()=>{});});nav.appendChild(b);});
+$('playBtn').addEventListener('click',()=>{if(audio.paused)audio.play().catch(()=>{});else audio.pause();});
+$('restartBtn').addEventListener('click',()=>{audio.currentTime=0;audio.play().catch(()=>{});});
+$('seek').addEventListener('input',e=>{audio.currentTime=Number(e.target.value);});
+$('cleanBtn').addEventListener('click',()=>{app.classList.toggle('clean-mv');$('cleanBtn').textContent=app.classList.contains('clean-mv')?'🧭 审片模式 (H)':'🎬 纯净 / 审片 (H)';});
+document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='h'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){app.classList.toggle('clean-mv');$('cleanBtn').textContent=app.classList.contains('clean-mv')?'🧭 审片模式 (H)':'🎬 纯净 / 审片 (H)';}if(e.code==='Space'&&!['INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();if(audio.paused)audio.play().catch(()=>{});else audio.pause();}});
+audio.addEventListener('ended',()=>{$('playBtn').textContent='▶';});
+backdrop.style.backgroundImage="url('assets/BG02.webp')";requestAnimationFrame(render);
+</script></body></html>
