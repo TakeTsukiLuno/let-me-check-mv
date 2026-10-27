@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LET ME CHECK｜VIBE v0.13.3 思维简报与CHECK代码终合成版</title>
+<title>LET ME CHECK｜VIBE v0.13.4 SC-07 CONTEXT 特殊演出版</title>
 <style>
 :root{--ink:#f7f1ff;--muted:#d1c6ec;--violet:#bca4ff;--gold:#ffd990;--line:rgba(224,207,255,.22);--panel:rgba(11,12,29,.82);--accent:#97e7ff;--pulse:0;--flash:0;}
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#080914;color:var(--ink);font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}body{display:grid;place-items:center;overflow:hidden}button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:rgba(18,18,43,.8);border-radius:999px;padding:8px 12px}button:hover{background:rgba(55,45,95,.9)}button.active{border-color:rgba(255,217,144,.8);box-shadow:inset 0 0 18px rgba(184,145,255,.16);color:#fff4d7}
@@ -70,6 +70,13 @@ header{position:absolute;left:2%;right:2%;top:2%;display:flex;align-items:center
 .caution:nth-child(1){top:31%;transform:rotate(-7deg) translateX(-3%)}
 .caution:nth-child(2){top:45%;transform:rotate(4deg) translateX(2%)}
 .caution:nth-child(3){top:59%;transform:rotate(-5deg) translateX(-1%)}
+/* v0.13.4: SC-07's context refrain stamps placards on-beat while warning tape chaotically crosses the character. */
+#cautionTape.context-chaos .caution{height:9%;opacity:.96;will-change:top,transform;transition:none}
+#contextPlacards{position:absolute;inset:0;z-index:3;pointer-events:none}
+.contextPlacard{position:absolute;left:50%;top:50%;display:flex;align-items:center;justify-content:center;min-width:clamp(112px,12.8vw,210px);padding:.25em .34em;border:3px solid #21162d;border-radius:3px;background:linear-gradient(135deg,#fff6ca 0%,#f5d875 58%,#e6b947 100%);color:#21162d;font-size:clamp(18px,2.2vw,38px);font-weight:1000;letter-spacing:.08em;white-space:nowrap;text-shadow:0 1px rgba(255,255,255,.45);box-shadow:0 0 0 2px rgba(255,240,180,.28),0 7px 0 rgba(15,10,23,.4),0 0 24px rgba(255,220,120,.3);visibility:hidden;opacity:0;transform:translate(-50%,-50%) scale(.2);transform-origin:center;will-change:transform,opacity}
+.contextPlacard::before{content:"◆";position:absolute;left:.28em;top:.08em;font-size:.34em;opacity:.55}
+.contextPlacard::after{content:"";position:absolute;inset:3px;border:1px solid rgba(37,22,45,.22);pointer-events:none}
+.contextPlacard.active{visibility:visible}
 #waitPause{position:absolute;inset:0;z-index:24;display:none;place-items:center;background:rgba(2,3,10,.94);pointer-events:none}
 #waitPause.on{display:grid}
 #waitPause .singleStar{width:4px;height:4px;border-radius:50%;background:#fff6d8;box-shadow:0 0 22px 8px rgba(180,170,255,.45);animation:starBreath 1.6s ease-in-out infinite}
@@ -388,7 +395,7 @@ header{position:absolute;left:2%;right:2%;top:2%;display:flex;align-items:center
 </head>
 <body><div id="app">
 <div id="backdrop"></div><div id="shade"></div><div id="flash"></div>
-<header><div class="brand"><span class="gem"></span><span>LET ME CHECK</span><span class="brandSub" style="opacity:.48">/ VIBE v0.13.3 思维简报与CHECK代码终合成版</span></div><div class="headright"><span class="chip" id="sceneCode">SC-01</span><span class="chip" id="materialTag">A 窗口展开</span></div></header>
+<header><div class="brand"><span class="gem"></span><span>LET ME CHECK</span><span class="brandSub" style="opacity:.48">/ VIBE v0.13.4 SC-07 CONTEXT 特殊演出版</span></div><div class="headright"><span class="chip" id="sceneCode">SC-01</span><span class="chip" id="materialTag">A 窗口展开</span></div></header>
 <div id="sceneInfo"><div id="sceneKicker">opening</div><div id="sceneTitle">一问，一点灵光</div><div id="sceneDesc">工作曲方向正确，现在补节奏动效层与洗脑密度。</div></div>
 <div id="chapterPill">00:00–00:14</div>
 <div id="visual">
@@ -454,7 +461,7 @@ header{position:absolute;left:2%;right:2%;top:2%;display:flex;align-items:center
     <div class="bubble rightSpeaker" id="bubble2"><span class="speakerLabel">Q / INTERRUPTING</span><span class="bubbleText">WAIT—ONE CAVEAT!</span></div>
     <div class="bubble" id="bubble3" style="display:none"></div>
   </div>
-  <div id="cautionTape"><div class="caution">CONTEXT REQUIRED · CONTEXT REQUIRED</div><div class="caution">CHECK THE CONTEXT · CHECK THE CONTEXT</div><div class="caution">IT DEPENDS · IT DEPENDS · IT DEPENDS</div></div>
+  <div id="cautionTape"><div class="caution">CONTEXT REQUIRED · CONTEXT REQUIRED</div><div class="caution">CHECK THE CONTEXT · CHECK THE CONTEXT</div><div class="caution">IT DEPENDS · IT DEPENDS · IT DEPENDS</div><div id="contextPlacards" aria-hidden="true"><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div><div class="contextPlacard">CONTEXT</div></div></div>
   <div id="waitPause"><div class="singleStar"></div></div>
   <div id="speedTunnel"></div><div id="spectrumBars"></div>
   <div id="endingBubble">?</div>
@@ -477,7 +484,7 @@ header{position:absolute;left:2%;right:2%;top:2%;display:flex;align-items:center
   <div id="scopeStatus" class="scopeStatus">尚未确认 · 可点击选择</div>
 </div>
 <div id="subtitleStack" aria-live="off"><div id="englishSubtitle"></div><div id="chineseSubtitle"></div></div>
-<div id="hint">VIBE v0.13：从 Git 存档对齐114句中英双语字幕；保留当前时码；真实视频和A倒放交由Codex导出。</div>
+<div id="hint">VIBE v0.13.4：保留114句中英双语字幕与原时码；SC-07 的 CONTEXT 牌和警示胶带仅在两次 IT DEPENDS ON THE CONTEXT 之间演出。</div>
 <div id="lyricBar"><div id="lyric">点击播放开始全片审看<small>FULL TIMELINE · 260s</small></div></div>
 <nav class="chapterNav" id="chapterNav"></nav>
 <div id="bottom"><button class="playbtn" id="playBtn">▶</button><button id="restartBtn">↺</button><button id="cleanBtn" title="切换纯净模式 / 审片模式 (H)">🎬 纯净 / 审片 (H)</button><input id="seek" class="seek" type="range" min="0" max="260.014" step="0.01" value="0"><span id="clock">00:00.0 / 04:20.0</span></div>
@@ -492,7 +499,7 @@ const scenes=[
 {start:32.107,end:44.497,code:'SC-03',range:'00:32–00:44',kicker:'search / connect',title:'页面、事实与线索',desc:'思维简报跟随歌词逐步展开：收集输入、核对事实、连接线索、保留不确定性，再把证据组织成结论。立绘与书页仍按节奏演出。',bg:'assets/BG02.webp',tag:'CG02 / CG03 / pages',layout:'search',heroes:['hero2','hero3'],hero:'hero2'},
 {start:44.497,end:76.862,code:'SC-05',range:'00:44–01:16',kicker:'visual anchor',title:'CHECK 副歌｜固定窗口＋小Q',desc:'BG03 静止；代码窗口持续滚动，行号不断递增，小Q按歌词句切换并轻弹。',bg:'assets/BG03.webp',tag:'BG03 + Q01–Q05',layout:'hook',heroes:[],hero:null},
 {start:76.862,end:96.975,code:'SC-06',range:'01:16–01:36',kicker:'comedy / interruption',title:'过度检查的喜剧对答',desc:'全身龙娘居中偏左，右侧独立 Q 区按歌词换表情并跟拍弹跳；对话气泡居中靠上，不再叠出第二张 Q 立绘。',bg:'assets/BG01.webp',tag:'全身立绘 + 右侧 Q / BG01',layout:'comedy',heroes:['hero1'],hero:'hero1'},
-{start:96.975,end:119.169,code:'SC-07',range:'01:36–01:59',kicker:'context loop',title:'第二轮检查｜语境逐渐变密',desc:'全身立绘按歌词句切换，右侧 Q 放大并按拍弹跳；背景随副歌轻轻起伏，不再有中央残留 Q。',bg:'assets/BG03.webp',tag:'CG03 / CG04 / pages',layout:'context',heroes:['hero3','hero4'],hero:'hero3'},
+{start:96.975,end:119.169,code:'SC-07',range:'01:36–01:59',kicker:'context loop',title:'第二轮检查｜语境逐渐变密',desc:'全身立绘按歌词句切换，右侧 Q 放大并按拍弹跳；L050–L052 期间按节拍盖上 CONTEXT 牌，警示胶带逐拍乱拉并交叉覆盖角色；L052 结束立即清场，L053 正常收束后过渡 SC-08；背景随副歌轻轻起伏。',bg:'assets/BG03.webp',tag:'CG03 / CG04 / pages',layout:'context',heroes:['hero3','hero4'],hero:'hero3'},
 {start:119.169,end:129.689,code:'SC-08',range:'01:59–02:09',kicker:'short answer / wait',title:'要求简短答案，然后停住',desc:'从信息密集回到简洁答案；背景先退场，人物残影提前消失，Wait 的打字演出保留。',bg:'assets/BG03.webp',tag:'答案卡 / Q版反应',layout:'answer',heroes:['hero17'],hero:'hero17'},
 {start:129.689,end:144.161,code:'SC-09',range:'02:09–02:24',kicker:'reflection / knowing',title:'停下来，什么才真正重要',desc:'CG34_S59 缓慢推镜至 “knowing”，交叉淡入 CG34_S63；末尾淡出并接续 SC-10。',bg:'none',tag:'CG34_S59 → CG34_S63',layout:'reflection',heroes:['cgSceneS59','cgSceneS63'],hero:'cgSceneS59'},
 {start:144.161,end:168.074,code:'SC-10',range:'02:24–02:48',kicker:'facts / signal',title:'重建事实与线索',desc:'左侧思维简报逐句提炼事实与判断；全段统一使用 do.webp 对应的 hero3 与前段 factsAction 尺寸，不再在 161.415 秒制造无效切换或缩小立绘。',bg:'assets/BG03.webp',tag:'do.webp / pages',layout:'facts',heroes:['hero3'],hero:'hero3'},
@@ -519,7 +526,7 @@ pageLayer=$('pageLayer'), kineticBg=$('kineticBg'), kineticWord=$('kineticWord')
 particleLayer=$('particleLayer'), cautionTape=$('cautionTape'), waitPause=$('waitPause'),
 spectrumBars=$('spectrumBars'), endingBubble=$('endingBubble'), waitType=$('waitType'), endingReveal=$('endingReveal'), speedTunnel=$('speedTunnel'),
 typeLayer=$('typeLayer'), hookText=$('hookText'), lineText=$('lineText'), subText=$('subText'), videoLayer=$('videoLayer'),
-checkRain=$('checkRain'), videoSlotTitle=$('videoSlotTitle'), videoSlotNote=$('videoSlotNote'), scopeStatus=$('scopeStatus'), englishSubtitle=$('englishSubtitle'), chineseSubtitle=$('chineseSubtitle'), subtitleStack=$('subtitleStack'), windowFx=$('windowFx'), windowFrame=$('windowFrame'), windowLabel=$('windowLabel'), windowScan=$('windowScan');
+checkRain=$('checkRain'), contextPlacards=[...document.querySelectorAll('.contextPlacard')], cautionBands=[...cautionTape.querySelectorAll('.caution')], videoSlotTitle=$('videoSlotTitle'), videoSlotNote=$('videoSlotNote'), scopeStatus=$('scopeStatus'), englishSubtitle=$('englishSubtitle'), chineseSubtitle=$('chineseSubtitle'), subtitleStack=$('subtitleStack'), windowFx=$('windowFx'), windowFrame=$('windowFrame'), windowLabel=$('windowLabel'), windowScan=$('windowScan');
 const heroEls=[...document.querySelectorAll('.hero')];
 let currentScene=-1,lastLyricId='',lastHero='',stampUntil=0,lastSceneChange=0,shakeUntil=0,chromaticUntil=0,flashUntil=0,lastKineticId='',lastTypeLyricId='',impactUntil=-1,lastChorusId='',lastVideoSlotCode='',lastBeatIndex=-999,lastComicQ='hero13',lastStableHeroSceneCode='',lastStableHero='',lastHeroSwitchAt=-999,lastWorkQSrc='assets/Q01.webp';
 const codeLines=[
@@ -601,6 +608,20 @@ const CHORUSES=[
   {id:'CH2',start:96.975,end:119.169,upgrade:'context'},
   {id:'CH3',start:168.074,end:186.820,upgrade:'wings'},
   {id:'FINAL',start:216.824,end:247.543,upgrade:'final'}
+];
+const CONTEXT_CHAOS_START=LYRICS.find(l=>l.id==='L050').start;
+const CONTEXT_CHAOS_END=LYRICS.find(l=>l.id==='L053').start;
+const CONTEXT_STAMP_LAYOUT=[
+  {x:19,y:24,rotate:-12},{x:75,y:21,rotate:11},{x:48,y:36,rotate:-4},
+  {x:20,y:51,rotate:13},{x:79,y:47,rotate:-14},{x:45,y:61,rotate:8},
+  {x:63,y:25,rotate:18},{x:29,y:35,rotate:-17},{x:67,y:64,rotate:5},
+  {x:13,y:72,rotate:-7},{x:88,y:34,rotate:16},{x:50,y:48,rotate:-10}
+];
+const CONTEXT_TAPE_LAYOUT=[
+  {top:12,rotate:-18,shift:-16},{top:24,rotate:9,shift:8},{top:36,rotate:24,shift:-4},
+  {top:48,rotate:-12,shift:13},{top:60,rotate:17,shift:-15},{top:70,rotate:-26,shift:5},
+  {top:18,rotate:6,shift:18},{top:42,rotate:-15,shift:-8},{top:55,rotate:21,shift:11},
+  {top:28,rotate:-4,shift:-13},{top:64,rotate:28,shift:2},{top:33,rotate:-9,shift:15}
 ];
 const CHORUS_POSES=[
   {hero:'hero2',name:'LET ME',anchor:{x:5,y:78,align:'left',width:43},crop:'center',scale:1.00,color:'check',x:34,y:50,height:80},
@@ -976,8 +997,7 @@ function positionFullbodyHero(heroId,scene,t,lyric,pose=null){
     correction:{x:71,y:51,h:90,maxH:95,maxW:60},
     deliver:{x:67,y:50,h:91,maxH:96,maxW:64},
     concert:{x:64,y:50,h:89,maxH:94,maxW:64},
-    ending:{x:73,y:51,h:82,maxH:87,maxW:64},
-    chorus:{x:34,y:50,h:80,maxH:85,maxW:46},
+    ending:{x:73,y:51,h:82,maxH:87,maxW:64},    chorus:{x:34,y:50,h:80,maxH:85,maxW:46},
     comedy:{x:32,y:56,h:80,maxH:90,maxW:52}
   };
   let key=scene?.layout||'default';
@@ -997,7 +1017,8 @@ function positionFullbodyHero(heroId,scene,t,lyric,pose=null){
   el.style.setProperty('--hero-max-h',p.maxH+'%');
   el.style.setProperty('--hero-max-w',p.maxW+'%');
   el.style.setProperty('--hero-scale',String(p.scale||1));
-  el.style.setProperty('--hero-jump','0px');  el.style.setProperty('--hero-squash','1');
+  el.style.setProperty('--hero-jump','0px');
+  el.style.setProperty('--hero-squash','1');
   el.style.width='auto';
   el.style.objectPosition='center';
 }
@@ -1335,6 +1356,54 @@ function applyPromiseCode(scene,t,lyric){
   codeWindow.style.boxShadow=`0 0 0 5px rgba(167,139,255,.04),0 0 ${38+kick*16}px rgba(106,88,200,.22),inset 0 0 40px rgba(146,121,255,.05)`;
 }
 
+function updateContextChaos(t,scene){
+  const active=scene?.code==='SC-07'&&t>=CONTEXT_CHAOS_START&&t<CONTEXT_CHAOS_END;
+  if(!active){
+    cautionTape.classList.remove('on','context-chaos');
+    contextPlacards.forEach(el=>{el.classList.remove('active');el.style.opacity='0';});
+    return;
+  }
+  cautionTape.classList.add('on','context-chaos');
+  // Start on the first 152 BPM grid point after L050 begins. All state derives from audio time,
+  // so scrubbing into or out of the refrain reconstructs the same arrangement deterministically.
+  const firstBeatIndex=Math.ceil((CONTEXT_CHAOS_START-OFFSET)/BEAT-1e-6);
+  const firstBeatTime=OFFSET+firstBeatIndex*BEAT;
+  const beforeFirstBeat=t<firstBeatTime;
+  const localBeatFloat=beforeFirstBeat?0:(t-firstBeatTime)/BEAT;
+  const stampBeat=Math.floor(localBeatFloat+1e-6);
+  const phase=beforeFirstBeat?0:localBeatFloat-stampBeat;
+  const visibleCount=beforeFirstBeat?0:Math.min(contextPlacards.length,stampBeat+1);
+
+  contextPlacards.forEach((el,i)=>{
+    const visible=i<visibleCount;
+    el.classList.toggle('active',visible);
+    if(!visible){el.style.opacity='0';return;}
+    const p=Math.max(0,localBeatFloat-i);
+    const layout=CONTEXT_STAMP_LAYOUT[i%CONTEXT_STAMP_LAYOUT.length];
+    const settle=Math.min(1,p/.34);
+    const scale=p<.34?(.52+.55*(1-Math.pow(1-settle,3))):1.07-.07*Math.min(1,(p-.34)/.14);
+    const opacity=p<.12?.2+.76*(p/.12):.96;
+    const tremble=Math.sin(phase*Math.PI*2+i*.8)*1.35;
+    el.style.left=layout.x+'%';
+    el.style.top=layout.y+'%';
+    el.style.opacity=String(opacity);
+    el.style.transform=`translate(-50%,-50%) rotate(${layout.rotate+tremble}deg) scale(${scale})`;
+  });
+
+  const tapeStep=Math.floor(localBeatFloat+1e-6);
+  cautionBands.forEach((el,i)=>{
+    const index=(tapeStep*2+i*4)%CONTEXT_TAPE_LAYOUT.length;
+    const a=CONTEXT_TAPE_LAYOUT[index],b=CONTEXT_TAPE_LAYOUT[(index+1)%CONTEXT_TAPE_LAYOUT.length];
+    const top=a.top+(b.top-a.top)*phase;
+    const rotate=a.rotate+(b.rotate-a.rotate)*phase;
+    const shift=a.shift+(b.shift-a.shift)*phase;
+    el.style.top=top+'%';
+    el.style.transform=`translateX(${shift}%) rotate(${rotate}deg)`;
+    el.style.opacity=String(.9+.08*Math.sin(phase*Math.PI+i));
+    el.style.zIndex=String(i+1);
+  });
+}
+
 function applyScene(idx,t,lyric,now){
   if(idx<0)return;
   const s=scenes[idx],local=t-s.start,chorus=chorusAt(t);
@@ -1392,6 +1461,7 @@ function applyScene(idx,t,lyric,now){
     applyChorusFrame(chorus,t,lyric,s);
     updateBeat(t,s,lyric,now);
     updateTypeLayer(t,s,lyric,chorus);
+    updateContextChaos(t,s);
     stamp.style.opacity='0';
     return;
   }
